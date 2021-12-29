@@ -8,7 +8,7 @@ import NavbarMobile from "./NavbarMobile";
 export default function Example() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   // todo: get static data
-  const [currentItem, setCurrentItem] = useState();
+  const [currentItem, setCurrentItem] = useState<string>("Dashboard");
 
   const onItemClick = (item: NavItem) => {
     setCurrentItem(item.name);
