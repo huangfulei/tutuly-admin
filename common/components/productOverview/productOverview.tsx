@@ -1,10 +1,14 @@
 import { SubmitHandler, useForm } from "react-hook-form";
+import { addDocWithAutoID } from "./../../../firebase/firestore/write";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 interface IFormInput {
   productName: string;
   description: string;
   varName: string;
-  price: string;
+  price: number;
+  stock: number;
   color: string;
   pictures: string;
   labels: string;
@@ -12,12 +16,19 @@ interface IFormInput {
 }
 
 export default function ProductOverview() {
+  const router = useRouter();
+  const { isNew } = router.query;
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm<IFormInput>();
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
+  const [labels, setLabels] = useState();
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    if (isNew) {
+      // await addDocWithAutoID("productOverview", data);
+      router.back();
+    }
     console.log(data);
   };
 
@@ -44,9 +55,9 @@ export default function ProductOverview() {
               {...register("productName", { required: true })}
               className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
             />
-            <div className="text-red-500 text-xs italic">
-              {errors.productName && "Product name is required"}
-            </div>
+          </div>
+          <div className="text-red-500 text-xs italic">
+            {errors.productName && "Product name is required"}
           </div>
         </div>
 
@@ -67,31 +78,52 @@ export default function ProductOverview() {
               className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md"
               defaultValue={""}
             />
-            <div className="text-red-500 text-xs italic">
-              {errors.description && "Product description is required"}
-            </div>
+          </div>
+          <div className="text-red-500 text-xs italic">
+            {errors.description && "Product description is required"}
           </div>
         </div>
 
         {/* Labels */}
         <div className="sm:col-span-6">
-          <label htmlFor="labels" className="text-sm font-medium text-gray-700">
-            Labels
-          </label>
+          <div className="flex justify-between">
+            <label
+              htmlFor="labels"
+              className="text-sm font-medium text-gray-700"
+            >
+              Labels
+            </label>
 
-          {/* todo display labels */}
-          <div />
-          <div className="mt-1 rounded-md shadow-sm flex">
+            {/* todo display labels */}
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} className="m-1 btn btn-primary">
+                Add Labels
+              </div>
+              <ul
+                tabIndex={0}
+                className="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52"
+              >
+                <li>
+                  <a>Item 1</a>
+                </li>
+                <li>
+                  <a>Item 2</a>
+                </li>
+                <li>
+                  <a>Item 3</a>
+                </li>
+              </ul>
+            </div>
+            {/* <div className="mt-1 rounded-md shadow-sm flex space-x-2">
             <input
-              type="text"
-              id="labels"
-              autoComplete="labels"
-              {...register("labels")}
-              className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
+            type="text"
+            id="labels"
+            autoComplete="labels"
+            {...register("labels")}
+            className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
             />
-            <button className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Add
-            </button>
+            <div className="btn btn-primary">Add</div>
+          </div> */}
           </div>
         </div>
 
@@ -104,7 +136,7 @@ export default function ProductOverview() {
 
         {/* Additional info item */}
         {/* Title */}
-        <div className="sm:col-span-6">
+        <div className="sm:col-span-6 space-y-2">
           <label htmlFor="title" className="text-sm font-normal text-gray-700">
             Title
           </label>
@@ -135,9 +167,7 @@ export default function ProductOverview() {
             />
           </div>
           <div className="w-full flex justify-end">
-            <button className="my-2 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              Add
-            </button>
+            <div className="btn btn-primary">Add</div>
           </div>
         </div>
 
@@ -191,6 +221,25 @@ export default function ProductOverview() {
           </div>
           <div className="text-red-500 text-xs italic">
             {errors.price && "Price is required"}
+          </div>
+        </div>
+
+        {/* Stock */}
+        <div className="sm:col-span-3">
+          <label htmlFor="stock" className="text-sm font-medium text-gray-700">
+            Stock
+          </label>
+          <div className="mt-1 rounded-md shadow-sm flex">
+            <input
+              type="number"
+              id="stock"
+              autoComplete="stock"
+              {...register("stock", { required: true })}
+              className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
+            />
+          </div>
+          <div className="text-red-500 text-xs italic">
+            {errors.stock && "Stock is required"}
           </div>
         </div>
 
@@ -266,25 +315,10 @@ export default function ProductOverview() {
       </div>
 
       <div className="pt-5 flex justify-between">
-        <button
-          type="button"
-          className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-        >
-          Add New Variant
-        </button>
-        <div className="flex justify-end">
-          <button
-            type="button"
-            className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Save
-          </button>
+        <div className="btn btn-primary">Add New Variant</div>
+        <div className="flex justify-end space-x-2">
+          <div className="btn btn-ghost">Cancel</div>
+          <button className="btn btn-primary">Save</button>
         </div>
       </div>
       {/* End main area */}
