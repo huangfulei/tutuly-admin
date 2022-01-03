@@ -10,7 +10,7 @@ export default function ProductList() {
   const [products, setProducts] = useState<IProductOverview[]>();
 
   useEffect(() => {
-    getAllDocs("productOverview").then((snap) => {
+    getAllDocs("products").then((snap) => {
       const allProducts = snap.docs.map((doc) => {
         return { ...doc.data(), id: doc.id };
       });
