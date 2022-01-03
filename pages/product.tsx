@@ -32,7 +32,7 @@ const Product: React.FunctionComponent<ProductProps> = () => {
     const status = event.target.value;
     if (isNew === "false") {
       // update product info
-      await setDocWithID("productOverview/" + id, { status: status }, true);
+      await setDocWithID("products/" + id, { status: status }, true);
     }
     setStatus(status);
   };
@@ -40,9 +40,9 @@ const Product: React.FunctionComponent<ProductProps> = () => {
   const onSave = async (data: IProductOverview, isDirty: boolean) => {
     if (isDirty) {
       if (isNew === "true") {
-        await addDocWithAutoID("productOverview", { ...data, status: status });
+        await addDocWithAutoID("products", { ...data, status: status });
       } else {
-        await setDocWithID("productOverview/" + id, data, true);
+        await setDocWithID("products/" + id, data, true);
       }
     }
     router.back();
@@ -50,14 +50,14 @@ const Product: React.FunctionComponent<ProductProps> = () => {
 
   const onDelete = async () => {
     if (isNew === "false") {
-      await deleteADoc("productOverview/" + id);
+      await deleteADoc("products/" + id);
       router.back();
     }
   };
 
   useEffect(() => {
     if (isNew === "false") {
-      getADoc("productOverview/" + id).then((doc) => {
+      getADoc("products/" + id).then((doc) => {
         if (doc.exists()) {
           const product: IProductOverview = doc.data() as IProductOverview;
           setProduct(product);
