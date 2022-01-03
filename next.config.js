@@ -4,6 +4,6 @@ module.exports = {
   images: {
     domains: ['firebasestorage.googleapis.com'],
       loader: "imgix",
-      path: "https://noop/",
+      path: "",
   },
 }
