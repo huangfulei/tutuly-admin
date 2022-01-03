@@ -1,10 +1,6 @@
 import { SEO } from "../common/components/SEO";
 import Labels from "./../common/components/labels/Labels";
 
-export interface ILabel {
-  name: string;
-}
-
 interface LabelsProps {}
 
 const LabelsPage: React.FunctionComponent<LabelsProps> = () => {

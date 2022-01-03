@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  setDocWithID,
   deleteADoc,
   getAllDocs,
+  setDocWithID,
 } from "./../../../firebase/firestore/write";
-import { ILabel } from "./../../../pages/labels";
+import { ILabel } from "./ILabel";
 
 interface LabelsProps {}
 

@@ -1,24 +1,31 @@
+import { ILabel } from "../labels/ILabel";
+
 export interface IProductOverview {
-    id: string;
-    name: string;
-    rating: number;
-    labels: string[];
-    description: string;
-    details: {
-      name: string;
-      items: string[];
-    }[];
-    variants: {
-      name: string;
-      price: number;
-      images: {
-        id: number;
-        name: string;
-        src: string;
-        alt: string;
-      }[];
-      stock: number;
-      bgColor: string;
-    }[];
-  }
-  
+  id?: string;
+  name: string;
+  priority: number;
+  status: string;
+  rating?: number;
+  labels?: ILabel[];
+  description: string;
+  details?: IDetail[];
+  variants: IVariant[];
+}
+
+export interface IVariant {
+  name: string;
+  price: number;
+  stock: number;
+  images?: IImage[];
+}
+
+export interface IDetail {
+  title: string;
+  detail: string;
+}
+
+export interface IImage {
+  name: string;
+  src: string;
+  alt: string;
+}

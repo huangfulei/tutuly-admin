@@ -1,7 +1,22 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { productList } from "./mockdata";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { ILabel } from "../labels/ILabel";
+import { IProductOverview } from "../productOverview/IProductOverview";
+import { getAllDocs } from "./../../../firebase/firestore/write";
 
 export default function ProductList() {
+  const [products, setProducts] = useState<IProductOverview[]>();
+
+  useEffect(() => {
+    getAllDocs("productOverview").then((snap) => {
+      const allProducts = snap.docs.map((doc) => {
+        return { ...doc.data(), id: doc.id };
+      });
+      setProducts(allProducts);
+    });
+  }, []);
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -40,14 +55,20 @@ export default function ProductList() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {productList.map((product) => (
-                  <tr key={product.id}>
+                {products?.map((product) => (
+                  <tr key={product.name}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <img
+                          <Image
                             className="h-10 w-10 rounded-full"
-                            src={product.imageSrc}
+                            src={
+                              product.variants[0].images
+                                ? product.variants[0].images[0].src
+                                : ""
+                            }
+                            height={50}
+                            width={50}
                             alt=""
                           />
                         </div>
@@ -59,29 +80,34 @@ export default function ProductList() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {product.labels.map((label) => {
+                      {product?.labels?.map((label: ILabel) => {
                         return (
-                          <div key={label} className="text-sm text-gray-900">
-                            {label}
+                          <div
+                            key={label.name}
+                            className="text-sm text-gray-900"
+                          >
+                            {label.name}
                           </div>
                         );
                       })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Active
+                        {product.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {product.price}
+                      {/* {product.price} */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <a
-                        href="#"
-                        className="text-indigo-600 hover:text-indigo-900"
-                      >
-                        Edit
-                      </a>
+                      <Link href={`/product?isNew=false&&id=${product.id}`}>
+                        <a
+                          href="#"
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
+                          Edit
+                        </a>
+                      </Link>
                     </td>
                   </tr>
                 ))}
