@@ -29,7 +29,6 @@ const Product: React.FunctionComponent<ProductProps> = () => {
   const onStatusChange = async (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    console.log(event.target.value);
     const status = event.target.value;
     if (isNew === "false") {
       // update product info
@@ -39,8 +38,6 @@ const Product: React.FunctionComponent<ProductProps> = () => {
   };
 
   const onSave = async (data: IProductOverview, isDirty: boolean) => {
-    console.log(isDirty);
-
     if (isDirty) {
       if (isNew === "true") {
         await addDocWithAutoID("productOverview", { ...data, status: status });

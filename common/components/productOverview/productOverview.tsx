@@ -281,8 +281,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
 
           {/* Variants */}
           {variants?.map((variant, index) => {
-            console.log(index);
-
             return (
               <div key={variant.id} className="grid sm:col-span-6 space-y-2">
                 {/* Divider */}
@@ -403,7 +401,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                 Add More Variant
               </div>
               <div className="flex justify-end space-x-2">
-                <div className="btn btn-ghost" onClick={()=>router.back()}>
+                <div className="btn btn-ghost" onClick={() => router.back()}>
                   Cancel
                 </div>
                 <button className="btn btn-primary">Save</button>

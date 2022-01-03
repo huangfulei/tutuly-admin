@@ -12,7 +12,6 @@ interface NavbarDesktopProps {
 
 const NavbarDesktop: React.FunctionComponent<NavbarDesktopProps> = (props) => {
   const { navigation, currentItem, onItemClick } = props;
-  console.log(currentItem);
 
   return (
     <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
@@ -61,7 +60,6 @@ const NavbarDesktop: React.FunctionComponent<NavbarDesktopProps> = (props) => {
                         ? (open = true)
                         : undefined}
 
-                      {console.log("checking: ", open)}
                       <Disclosure.Button
                         className={classNames(
                           item.name === currentItem
