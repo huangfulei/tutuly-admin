@@ -27,7 +27,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     register,
     control,
     reset,
-    setError,
     formState: { errors },
     handleSubmit,
   } = form;
