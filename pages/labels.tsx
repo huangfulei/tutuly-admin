@@ -1,9 +1,20 @@
+import { httpsCallable } from "firebase/functions";
 import { SEO } from "../common/components/SEO";
+import { functions } from "../firebase/clientApp";
 import Labels from "./../common/components/labels/Labels";
 
 interface LabelsProps {}
 
 const LabelsPage: React.FunctionComponent<LabelsProps> = () => {
+  const helloWorld = httpsCallable(functions, "helloWorld");
+  helloWorld().then((result) => {
+    // Read result of the Cloud Function.
+    /** @type {any} */
+    // const data = result.data;
+    // const sanitizedMessage = data.text;
+    console.log(result);
+  });
+
   return (
     <>
       <SEO />

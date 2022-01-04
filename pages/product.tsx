@@ -38,6 +38,11 @@ const Product: React.FunctionComponent<ProductProps> = () => {
   };
 
   const onSave = async (data: IProductOverview, isDirty: boolean) => {
+    if (data.labels) {
+      data.labels = data.labels.map((label) => {
+        return label.name;
+      });
+    }
     if (isDirty) {
       if (isNew === "true") {
         await addDocWithAutoID("products", { ...data, status: status });
@@ -60,6 +65,11 @@ const Product: React.FunctionComponent<ProductProps> = () => {
       getADoc("products/" + id).then((doc) => {
         if (doc.exists()) {
           const product: IProductOverview = doc.data() as IProductOverview;
+          if (product.labels) {
+            product.labels = product.labels.map((label) => {
+              return { name: label };
+            });
+          }
           setProduct(product);
           setStatus(product.status);
         }
@@ -98,5 +108,11 @@ const Product: React.FunctionComponent<ProductProps> = () => {
     </>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {}, // will be passed to the page component as props
+  };
+}
 
 export default Product;

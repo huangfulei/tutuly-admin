@@ -62,11 +62,7 @@ export default function ProductList() {
                         <div className="flex-shrink-0 h-10 w-10">
                           <Image
                             className="h-10 w-10 rounded-full"
-                            src={
-                              product.variants[0].images
-                                ? product.variants[0].images[0].src
-                                : ""
-                            }
+                            src={product.mainImage!.src}
                             height={50}
                             width={50}
                             alt=""
@@ -80,13 +76,10 @@ export default function ProductList() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {product?.labels?.map((label: ILabel) => {
+                      {product?.labels?.map((label: string) => {
                         return (
-                          <div
-                            key={label.name}
-                            className="text-sm text-gray-900"
-                          >
-                            {label.name}
+                          <div key={label} className="text-sm text-gray-900">
+                            {label}
                           </div>
                         );
                       })}
