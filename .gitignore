@@ -36,6 +36,7 @@ yarn-error.log*
 # firebase
 *.log
 .firebase
+functions/
 
 # dev
 assets/
