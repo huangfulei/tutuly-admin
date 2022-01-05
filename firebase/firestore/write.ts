@@ -2,13 +2,11 @@ import {
   addDoc,
   collection,
   deleteDoc,
-  getDocs,
   doc,
   DocumentData,
   DocumentSnapshot,
   getDoc,
-  QuerySnapshot,
-  serverTimestamp,
+  getDocs,
   setDoc,
 } from "@firebase/firestore";
 import { db } from "../clientApp";
@@ -19,7 +17,7 @@ export const getADoc = async (
   return await getDoc(doc(db, path));
 };
 
-export const getAllDocs = async (path: string): Promise<QuerySnapshot<any>> => {
+export const getAllDocs = async (path: string) => {
   return await getDocs(collection(db, path));
 };
 
@@ -28,18 +26,11 @@ export const setDocWithID = async (
   data: any,
   merge?: boolean
 ): Promise<void> => {
-  return await setDoc(
-    doc(db, path),
-    { ...data, modifiedTime: serverTimestamp() },
-    { merge }
-  );
+  return await setDoc(doc(db, path), data, { merge });
 };
 
 export const addDocWithAutoID = async (path: string, data: any) => {
-  return await addDoc(collection(db, path), {
-    ...data,
-    modifiedTime: serverTimestamp(),
-  });
+  return await addDoc(collection(db, path), data);
 };
 
 export const deleteADoc = async (path: string) => {
