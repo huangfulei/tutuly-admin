@@ -2,14 +2,14 @@ import { ArrowNarrowLeftIcon } from "@heroicons/react/outline";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import ProductOverview from "../common/components/productOverview/ProductOverview";
-import { SEO } from "../common/components/SEO";
+import ProductOverview from "../app/components/productOverview/ProductOverview";
+import { SEO } from "../app/components/SEO";
 import {
   addDocWithAutoID,
   getADoc,
   setDocWithID,
 } from "../firebase/firestore/write";
-import { IProductOverview } from "./../common/components/productOverview/IProductOverview";
+import { IProductOverview } from "../app/components/productOverview/IProductOverview";
 import { deleteADoc } from "./../firebase/firestore/write";
 interface ProductProps {}
 

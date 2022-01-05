@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ILabel } from "../labels/ILabel";
 import { IProductOverview } from "../productOverview/IProductOverview";
-import { getAllDocs } from "./../../../firebase/firestore/write";
+import { getAllDocs } from "../../../firebase/firestore/write";
 
 export default function ProductList() {
   const [products, setProducts] = useState<IProductOverview[]>();

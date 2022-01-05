@@ -1,5 +1,5 @@
-import { SEO } from "../common/components/SEO";
-import ProductList from "./../common/components/productList/ProductList";
+import { SEO } from "../app/components/SEO";
+import ProductList from "../app/components/productList/ProductList";
 import Link from "next/link";
 interface AllProductsProps {}
 

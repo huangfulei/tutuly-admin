@@ -1,7 +1,7 @@
 import { httpsCallable } from "firebase/functions";
-import { SEO } from "../common/components/SEO";
+import { SEO } from "../app/components/SEO";
 import { functions } from "../firebase/clientApp";
-import Labels from "./../common/components/labels/Labels";
+import Labels from "../app/components/labels/Labels";
 
 interface LabelsProps {}
 
