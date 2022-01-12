@@ -12,7 +12,7 @@ export default function ProductList() {
   useEffect(() => {
     getAllDocs("products").then((snap) => {
       const allProducts = snap.docs.map((doc) => {
-        return { ...doc.data(), id: doc.id };
+        return { ...doc.data(), id: doc.id } as IProductOverview;
       });
       setProducts(allProducts);
     });

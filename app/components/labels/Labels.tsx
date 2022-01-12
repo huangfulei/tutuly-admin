@@ -34,7 +34,7 @@ const Labels: React.FunctionComponent<LabelsProps> = () => {
     // set labels from DB
     getAllDocs("labels").then((docs) => {
       docs.forEach((doc) => {
-        setLabels((prevLabels) => [...prevLabels, doc.data()]);
+        setLabels((prevLabels) => [...prevLabels, doc.data() as ILabel]);
       });
     });
   }, []);
