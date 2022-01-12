@@ -11,6 +11,7 @@ import {
 } from "../firebase/firestore/write";
 import { IProductOverview } from "../app/components/productOverview/IProductOverview";
 import { deleteADoc } from "./../firebase/firestore/write";
+import { uuid } from "uuidv4";
 interface ProductProps {}
 
 const newProduct: IProductOverview = {
@@ -18,7 +19,7 @@ const newProduct: IProductOverview = {
   name: "",
   priority: 0,
   description: "",
-  variants: [{ name: "", price: 0, stock: 0, images: [] }],
+  variants: [{ id: uuid(), name: "", price: 0, stock: 0, images: [] }],
 };
 const Product: React.FunctionComponent<ProductProps> = () => {
   const router = useRouter();
@@ -38,12 +39,13 @@ const Product: React.FunctionComponent<ProductProps> = () => {
   };
 
   const onSave = async (data: IProductOverview, isDirty: boolean) => {
-    if (data.labels) {
-      data.labels = data.labels.map((label) => {
-        return label.name;
-      });
-    }
     if (isDirty) {
+      if (data.labels) {
+        data.labels = data.labels.map((label) => {
+          return label.name;
+        });
+      }
+      data.priority = Number(data.priority);
       if (isNew === "true") {
         await addDocWithAutoID("products", { ...data, status: status });
       } else {

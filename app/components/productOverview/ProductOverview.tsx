@@ -87,7 +87,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     // set labels from DB
     getAllDocs("labels").then((docs) => {
       docs.forEach((doc) => {
-        setLabels((prevLabels) => [...prevLabels, doc.data()]);
+        setLabels((prevLabels) => [...prevLabels, doc.data() as ILabel]);
       });
     });
 
@@ -138,8 +138,9 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
               <input
                 type="number"
                 id="priority"
-                autoComplete="priority"
-                {...register(`priority`, { required: true })}
+                {...register(`priority`, {
+                  required: true,
+                })}
                 className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
               />
             </div>
@@ -428,7 +429,8 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
           </div>
 
           {/* Variants */}
-          {variants?.map((variant, index) => {
+          {variants.map((variant, index) => {
+            register(`variants.${index}.id`, { value: variant.id });
             return (
               <div key={variant.id} className="grid sm:col-span-6 space-y-2">
                 {/* Divider */}
