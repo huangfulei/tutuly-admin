@@ -1,3 +1,4 @@
+import { httpsCallable } from "firebase/functions";
 import {
   deleteObject,
   getDownloadURL,
@@ -16,21 +17,24 @@ import {
 } from "react-hook-form";
 import { HiX } from "react-icons/hi";
 import { uuid } from "uuidv4";
-import { storage } from "../../../firebase/clientApp";
+import { functions, storage } from "../../../firebase/clientApp";
 import { getAllDocs } from "../../../firebase/firestore/write";
 import { ILabel } from "../labels/ILabel";
 import { IImage, IProductOverview } from "./IProductOverview";
 import ProductImages from "./ProductImages";
 
 interface ProductOverviewProps {
-  product?: IProductOverview;
-  onSave: (data: IProductOverview, isDirty: boolean) => void;
+  product: IProductOverview;
 }
 
 const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
-  const { product, onSave } = props;
+  const { product } = props;
+
+  const [newVariantIDs, setNewVariantIDs] = useState<string[]>([]);
   const router = useRouter();
-  const form = useForm<IProductOverview>();
+  const form = useForm<IProductOverview>({
+    defaultValues: { ...product, mainImage: undefined },
+  });
   const {
     register,
     setValue,
@@ -40,9 +44,15 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     formState: { errors },
     handleSubmit,
   } = form;
-  const { isDirty } = useFormState({ control });
+  const { isDirty, isValid } = useFormState({ control });
   const [labels, setLabels] = useState<ILabel[]>([]);
-  const [mainImage, setMainImage] = useState<IImage>();
+  const [mainImage, setMainImage] = useState<IImage | undefined>(
+    product.mainImage
+  );
+
+  // register main Image for the form(in additional to the product object)
+  register("mainImage", { required: true });
+
   const {
     fields: addInfo,
     append: appendDetail,
@@ -70,18 +80,36 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     name: "variants",
   });
 
-  const onSubmit: SubmitHandler<IProductOverview> = async (data) => {
-    await onSave(data, isDirty);
+  const onSubmit: SubmitHandler<IProductOverview> = async (
+    product: IProductOverview
+  ) => {
+    console.log(product);
+    console.log(errors);
+    console.log(isValid);
+
+    // map labels to be string array
+    if (product.labels) {
+      product.labels = product.labels.map((label) => {
+        return label.name;
+      });
+    }
+    // set priority to be number
+    product.priority = Number(product.priority);
+
+    if (product.id === "new") {
+      // call save product
+      console.log(product);
+
+      const addProduct = httpsCallable(functions, "addProduct");
+      await addProduct(product);
+    } else {
+      // check if has new variant, call function to create new price and update product
+      const updateProduct = httpsCallable(functions, "updateProduct");
+      await updateProduct({ product, variantIDs: newVariantIDs });
+    }
+    router.back();
     reset();
   };
-
-  useEffect(() => {
-    if (product) {
-      reset(product);
-      setMainImage(product.mainImage);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product]);
 
   useEffect(() => {
     // set labels from DB
@@ -90,9 +118,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
         setLabels((prevLabels) => [...prevLabels, doc.data() as ILabel]);
       });
     });
-
-    // register main Image
-    register("mainImage", { required: true });
   }, []);
 
   return (
@@ -104,7 +129,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
         {/* Start main area*/}
         <div className=" mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           {/* ProductName */}
-          {/* <div className="sm:col-span-6"> */}
           <div className="sm:col-span-5">
             <label
               htmlFor="product name"
@@ -138,7 +162,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
               <input
                 type="number"
                 id="priority"
-                {...register(`priority`, {
+                {...register("priority", {
                   required: true,
                 })}
                 className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
@@ -252,6 +276,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                   deleteObject(desertRef)
                     .then(() => {
                       // File deleted successfully
+                      // reset to default value
                       resetField("mainImage");
                       setMainImage(undefined);
                     })
@@ -271,6 +296,15 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
           ) : (
             <div className="sm:col-span-6">
               {/* Add Pictures */}
+              <Image
+                className="grid w-32 h-32 bg-base-300 place-items-center"
+                src={
+                  "https://firebasestorage.googleapis.com/v0/b/tutuly-6acc2.appspot.com/o/app%2Fphoto-placeholder.png?alt=media&token=fb552a6b-bbc7-4f91-a885-4edd95f52579"
+                }
+                alt="Picture of the author"
+                width={200}
+                height={200}
+              />
               <label
                 htmlFor="cover-photo"
                 className="block text-sm font-medium text-gray-700"
@@ -327,7 +361,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                                       alt: imageName,
                                     };
 
-                                    // register("mainImage", { required: true });
                                     setValue("mainImage", image, {
                                       shouldDirty: true,
                                     });
@@ -430,7 +463,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
 
           {/* Variants */}
           {variants.map((variant, index) => {
-            register(`variants.${index}.id`, { value: variant.id });
+            // register(`variants.${index}.id`, { value: variant.id });
             return (
               <div key={variant.id} className="grid sm:col-span-6 space-y-2">
                 {/* Divider */}
@@ -489,7 +522,16 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                       autoComplete="price"
                       {...register(`variants.${index}.price`, {
                         required: true,
+                        min: 1,
                       })}
+                      onChange={() => {
+                        const exist = newVariantIDs.some(
+                          (id) => id === variant.id
+                        );
+                        if (!exist) {
+                          setNewVariantIDs([...newVariantIDs, variant.id]);
+                        }
+                      }}
                       className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
                     />
                     <div className="self-center ml-1">€</div>
@@ -539,13 +581,14 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                 className="btn btn-primary"
                 onClick={() => {
                   const newVar = {
-                    id: uuid(),
+                    // id: uuid(),
                     name: "",
                     price: 0,
                     stock: 0,
                     images: [],
                   };
                   appendVariant(newVar);
+                  // setNewVariants([...newVariants, newVar]);
                 }}
               >
                 Add More Variant
@@ -554,7 +597,13 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                 <div className="btn btn-ghost" onClick={() => router.back()}>
                   Cancel
                 </div>
-                <button className="btn btn-primary">Save</button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={!isDirty}
+                >
+                  Save
+                </button>
               </div>
             </div>
           </div>

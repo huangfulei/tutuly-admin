@@ -7,11 +7,11 @@ interface LabelsProps {}
 
 const LabelsPage: React.FunctionComponent<LabelsProps> = () => {
   const helloWorld = httpsCallable(functions, "helloWorld");
-  const saveProduct = httpsCallable(functions, "saveProduct");
+  // const saveProduct = httpsCallable(functions, "saveProduct");
 
-  helloWorld();
+  helloWorld().then((data) => console.log(data));
 
-  saveProduct({ name: "the best serum" });
+  // saveProduct({ product: { name: "the best serum" } });
 
   return (
     <>
