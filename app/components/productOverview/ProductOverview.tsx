@@ -29,7 +29,6 @@ interface ProductOverviewProps {
 
 const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const { product } = props;
-
   const [newVariantIDs, setNewVariantIDs] = useState<string[]>([]);
   const router = useRouter();
   const form = useForm<IProductOverview>({
@@ -49,9 +48,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const [mainImage, setMainImage] = useState<IImage | undefined>(
     product.mainImage
   );
-
-  // register main Image for the form(in additional to the product object)
-  register("mainImage", { required: true });
 
   const {
     fields: addInfo,
@@ -83,9 +79,8 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const onSubmit: SubmitHandler<IProductOverview> = async (
     product: IProductOverview
   ) => {
-    console.log(product);
-    console.log(errors);
-    console.log(isValid);
+    router.back();
+    reset();
 
     // map labels to be string array
     if (product.labels) {
@@ -107,8 +102,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
       const updateProduct = httpsCallable(functions, "updateProduct");
       await updateProduct({ product, variantIDs: newVariantIDs });
     }
-    router.back();
-    reset();
   };
 
   useEffect(() => {
@@ -118,6 +111,10 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
         setLabels((prevLabels) => [...prevLabels, doc.data() as ILabel]);
       });
     });
+
+    // register main Image for the form(in additional to the product object)
+    register("mainImage", { required: true });
+    setValue("mainImage", product.mainImage);
   }, []);
 
   return (
@@ -597,13 +594,11 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                 <div className="btn btn-ghost" onClick={() => router.back()}>
                   Cancel
                 </div>
-                <button
+                <input
                   type="submit"
                   className="btn btn-primary"
                   disabled={!isDirty}
-                >
-                  Save
-                </button>
+                ></input>
               </div>
             </div>
           </div>

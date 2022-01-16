@@ -1,16 +1,10 @@
-import { httpsCallable } from "firebase/functions";
-import { SEO } from "../app/components/SEO";
-import { functions } from "../firebase/clientApp";
 import Labels from "../app/components/labels/Labels";
+import { SEO } from "../app/components/SEO";
 
 interface LabelsProps {}
 
 const LabelsPage: React.FunctionComponent<LabelsProps> = () => {
-  const helloWorld = httpsCallable(functions, "helloWorld");
   // const saveProduct = httpsCallable(functions, "saveProduct");
-
-  helloWorld().then((data) => console.log(data));
-
   // saveProduct({ product: { name: "the best serum" } });
 
   return (

@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     };
   }, []);
   return (
-    <>
+    <AppLayout>
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <div className="relative w-24 h-24 animate-spin rounded-full bg-gradient-to-r from-purple-400 via-blue-500 to-red-400 ">
@@ -31,11 +31,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           </div>
         </div>
       ) : (
-        <AppLayout>
-          <Component {...pageProps} />
-        </AppLayout>
+        <Component {...pageProps} />
       )}
-    </>
+    </AppLayout>
   );
 }
 export default MyApp;
