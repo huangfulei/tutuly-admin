@@ -12,7 +12,6 @@ interface IProducts {
 
 const Products: React.FunctionComponent<IProducts> = (props) => {
   const { products } = props;
-
   return (
     <>
       <SEO />

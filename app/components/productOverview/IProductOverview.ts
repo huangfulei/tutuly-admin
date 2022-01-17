@@ -14,7 +14,7 @@ export interface IProductOverview {
 }
 
 export interface IVariant {
-  id: string;
+  id?: string;
   name: string;
   price: number;
   stock: number;

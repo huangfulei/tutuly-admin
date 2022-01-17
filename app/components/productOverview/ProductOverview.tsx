@@ -7,7 +7,7 @@ import {
 } from "firebase/storage";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FormProvider,
   SubmitHandler,
@@ -18,7 +18,7 @@ import {
 import { HiX } from "react-icons/hi";
 import { uuid } from "uuidv4";
 import { functions, storage } from "../../../firebase/clientApp";
-import { getAllDocs } from "../../../firebase/firestore/write";
+import { getAllDocs, setDocWithID } from "../../../firebase/firestore/write";
 import { ILabel } from "../labels/ILabel";
 import { IImage, IProductOverview } from "./IProductOverview";
 import ProductImages from "./ProductImages";
@@ -31,11 +31,14 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const { product } = props;
   const [newVariantIDs, setNewVariantIDs] = useState<string[]>([]);
   const router = useRouter();
+  const priceRef = useRef(null);
   const form = useForm<IProductOverview>({
     defaultValues: { ...product, mainImage: undefined },
   });
   const {
     register,
+    unregister,
+    getValues,
     setValue,
     control,
     reset,
@@ -79,6 +82,8 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const onSubmit: SubmitHandler<IProductOverview> = async (
     product: IProductOverview
   ) => {
+    console.log(product);
+
     router.back();
     reset();
 
@@ -99,8 +104,32 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
       await addProduct(product);
     } else {
       // check if has new variant, call function to create new price and update product
-      const updateProduct = httpsCallable(functions, "updateProduct");
-      await updateProduct({ product, variantIDs: newVariantIDs });
+      // const updateProduct = httpsCallable(functions, "updateProduct");
+      // await updateProduct({ product, variantIDs: newVariantIDs });
+      product.variants.map((variant) => {
+        console.log(
+          "checking",
+          newVariantIDs.some((id) => id === variant.id)
+        );
+
+        console.log("new var", newVariantIDs);
+
+        if (newVariantIDs.some((id) => id === variant.id)) {
+          console.log(
+            "changing",
+            newVariantIDs.some((id) => id === variant.id)
+          );
+
+          const updatePrice = httpsCallable(functions, "updatePrice");
+          updatePrice({
+            product,
+            variant,
+          });
+        }
+      });
+
+      product.variants.map((variant) => delete variant.id);
+      setDocWithID("products/" + product.id, product, true);
     }
   };
 
@@ -460,7 +489,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
 
           {/* Variants */}
           {variants.map((variant, index) => {
-            // register(`variants.${index}.id`, { value: variant.id });
             return (
               <div key={variant.id} className="grid sm:col-span-6 space-y-2">
                 {/* Divider */}
@@ -512,7 +540,10 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                   >
                     Price
                   </label>
-                  <div className="mt-1 rounded-md shadow-sm flex">
+                  <div
+                    ref={priceRef}
+                    className="mt-1 rounded-md shadow-sm flex"
+                  >
                     <input
                       type="number"
                       id="price"
@@ -528,6 +559,16 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                         if (!exist) {
                           setNewVariantIDs([...newVariantIDs, variant.id]);
                         }
+                        // if (product.id !== "new") {
+                        //   const updatePrice = httpsCallable(
+                        //     functions,
+                        //     "updatePrice"
+                        //   );
+                        //   updatePrice({
+                        //     product,
+                        //     variant: getValues(`variants.${index}`),
+                        //   });
+                        // }
                       }}
                       className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
                     />

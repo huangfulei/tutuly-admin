@@ -40,3 +40,6 @@ functions/
 
 # dev
 assets/
+
+# cicd
+.github/

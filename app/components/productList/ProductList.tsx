@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { functions } from "../../../firebase/clientApp";
+import useLoadingStateStore from "../../context/loadingStateStore";
 import { IProductOverview } from "../productOverview/IProductOverview";
 
 interface ProductListProps {
@@ -12,9 +13,11 @@ interface ProductListProps {
 
 const ProductList: React.FunctionComponent<ProductListProps> = (props) => {
   const router = useRouter();
+  const { setIsLoading } = useLoadingStateStore();
   const { products } = props;
 
   const deleteProduct = async (product: IProductOverview) => {
+    setIsLoading(true);
     const deleteProduct = httpsCallable(functions, "deleteProduct");
     await deleteProduct(product);
 
