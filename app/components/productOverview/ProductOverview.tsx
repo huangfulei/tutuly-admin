@@ -106,30 +106,18 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
       // check if has new variant, call function to create new price and update product
       // const updateProduct = httpsCallable(functions, "updateProduct");
       // await updateProduct({ product, variantIDs: newVariantIDs });
-      product.variants.map((variant) => {
-        console.log(
-          "checking",
-          newVariantIDs.some((id) => id === variant.id)
-        );
 
-        console.log("new var", newVariantIDs);
-
-        if (newVariantIDs.some((id) => id === variant.id)) {
-          console.log(
-            "changing",
-            newVariantIDs.some((id) => id === variant.id)
-          );
-
-          const updatePrice = httpsCallable(functions, "updatePrice");
-          updatePrice({
-            product,
-            variant,
-          });
-        }
+      await setDocWithID("products/" + product.id, product, true).then(() => {
+        product.variants.map((variant) => {
+          if (newVariantIDs.some((id) => id === variant.id)) {
+            const updatePrice = httpsCallable(functions, "updatePrice");
+            updatePrice({
+              product,
+              variant,
+            });
+          }
+        });
       });
-
-      product.variants.map((variant) => delete variant.id);
-      setDocWithID("products/" + product.id, product, true);
     }
   };
 
@@ -489,6 +477,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
 
           {/* Variants */}
           {variants.map((variant, index) => {
+            register(`variants.${index}.id`);
             return (
               <div key={variant.id} className="grid sm:col-span-6 space-y-2">
                 {/* Divider */}
