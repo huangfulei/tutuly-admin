@@ -1,9 +1,10 @@
-import { GetServerSideProps } from "next";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { GetStaticProps } from "next";
 import Link from "next/link";
 import ProductList from "../app/components/productList/ProductList";
 import { SEO } from "../app/components/SEO";
 import { IProductOverview } from "./../app/components/productOverview/IProductOverview";
-import { db } from "./../firebase/serverApp";
+import { db } from "./../firebase/clientApp";
 
 interface IProducts {
   products: IProductOverview[];
@@ -28,7 +29,22 @@ const Products: React.FunctionComponent<IProducts> = (props) => {
   );
 };
 
-// export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
+  const productsRef = collection(db, "products");
+  const q = query(productsRef, orderBy("priority", "desc"));
+  const querySnapshot = await getDocs(q);
+  const products = querySnapshot.docs.map((doc) => {
+    return { ...doc.data(), id: doc.id };
+  });
+
+  return {
+    props: { products }, // will be passed to the page component as props
+    revalidate: 1,
+  };
+};
+
+// export const getServerSideProps: GetServerSideProps = async () => {
+//   // get products by label and order by priority
 //   const productsRef = collection(db, "products");
 //   const q = query(productsRef, orderBy("priority", "desc"));
 //   const querySnapshot = await getDocs(q);
@@ -38,22 +54,7 @@ const Products: React.FunctionComponent<IProducts> = (props) => {
 
 //   return {
 //     props: { products }, // will be passed to the page component as props
-//     revalidate: 3,
 //   };
 // };
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  // get products by label and order by priority
-  const productsRef = db.collection("products");
-
-  const querySnapshot = await productsRef.orderBy("priority", "desc").get();
-  const products = querySnapshot.docs.map((doc) => {
-    return { ...doc.data(), id: doc.id };
-  });
-
-  return {
-    props: { products }, // will be passed to the page component as props
-  };
-};
 
 export default Products;

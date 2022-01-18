@@ -6,8 +6,11 @@ import { uuid } from "uuidv4";
 import { IProductOverview } from "../../app/components/productOverview/IProductOverview";
 import ProductOverview from "../../app/components/productOverview/ProductOverview";
 import { SEO } from "../../app/components/SEO";
-import { setDocWithID } from "../../firebase/firestore/client";
-import { getADoc, getAllDocs } from "../../firebase/firestore/server";
+import {
+  getADoc,
+  getAllDocs,
+  setDocWithID
+} from "../../firebase/firestore/client";
 interface ProductProps {
   product: IProductOverview;
   status: string;
@@ -83,8 +86,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   if (context.params?.id) {
     // get products and convert label to be string array
-    await getADoc("products/", context.params.id as string).then((doc) => {
-      if (doc.exists) {
+    await getADoc("products/" + context.params.id).then((doc) => {
+      if (doc.exists()) {
         product = { ...doc.data(), id: doc.id } as IProductOverview;
         if (product.labels) {
           product.labels = product.labels.map((label) => {
@@ -98,7 +101,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   return {
     props: { product, status }, // will be passed to the page component as props
-    revalidate: 10,
+    revalidate: 1,
   };
 };
 
