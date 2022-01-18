@@ -1,5 +1,5 @@
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import Link from "next/link";
 import ProductList from "../app/components/productList/ProductList";
 import { SEO } from "../app/components/SEO";
@@ -29,22 +29,7 @@ const Products: React.FunctionComponent<IProducts> = (props) => {
   );
 };
 
-// export const getStaticProps: GetStaticProps = async () => {
-//   const productsRef = collection(db, "products");
-//   const q = query(productsRef, orderBy("priority", "desc"));
-//   const querySnapshot = await getDocs(q);
-//   const products = querySnapshot.docs.map((doc) => {
-//     return { ...doc.data(), id: doc.id };
-//   });
-
-//   return {
-//     props: { products }, // will be passed to the page component as props
-//     revalidate: 10,
-//   };
-// };
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  // get products by label and order by priority
+export const getStaticProps: GetStaticProps = async () => {
   const productsRef = collection(db, "products");
   const q = query(productsRef, orderBy("priority", "desc"));
   const querySnapshot = await getDocs(q);
@@ -54,7 +39,22 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   return {
     props: { products }, // will be passed to the page component as props
+    revalidate: 1,
   };
 };
+
+// export const getServerSideProps: GetServerSideProps = async () => {
+//   // get products by label and order by priority
+//   const productsRef = collection(db, "products");
+//   const q = query(productsRef, orderBy("priority", "desc"));
+//   const querySnapshot = await getDocs(q);
+//   const products = querySnapshot.docs.map((doc) => {
+//     return { ...doc.data(), id: doc.id };
+//   });
+
+//   return {
+//     props: { products }, // will be passed to the page component as props
+//   };
+// };
 
 export default Products;
