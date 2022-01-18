@@ -18,7 +18,7 @@ import {
 import { HiX } from "react-icons/hi";
 import { uuid } from "uuidv4";
 import { functions, storage } from "../../../firebase/clientApp";
-import { getAllDocs, setDocWithID } from "../../../firebase/firestore/write";
+import { getAllDocs, setDocWithID } from "../../../firebase/firestore/client";
 import { ILabel } from "../labels/ILabel";
 import { IImage, IProductOverview } from "./IProductOverview";
 import ProductImages from "./ProductImages";

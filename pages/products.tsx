@@ -1,10 +1,9 @@
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { GetServerSideProps, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import Link from "next/link";
 import ProductList from "../app/components/productList/ProductList";
 import { SEO } from "../app/components/SEO";
 import { IProductOverview } from "./../app/components/productOverview/IProductOverview";
-import { db } from "./../firebase/clientApp";
+import { db } from "./../firebase/serverApp";
 
 interface IProducts {
   products: IProductOverview[];
@@ -45,9 +44,9 @@ const Products: React.FunctionComponent<IProducts> = (props) => {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   // get products by label and order by priority
-  const productsRef = collection(db, "products");
-  const q = query(productsRef, orderBy("priority", "desc"));
-  const querySnapshot = await getDocs(q);
+  const productsRef = db.collection("products");
+
+  const querySnapshot = await productsRef.orderBy("priority", "desc").get();
   const products = querySnapshot.docs.map((doc) => {
     return { ...doc.data(), id: doc.id };
   });

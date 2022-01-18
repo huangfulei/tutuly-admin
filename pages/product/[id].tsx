@@ -6,11 +6,8 @@ import { uuid } from "uuidv4";
 import { IProductOverview } from "../../app/components/productOverview/IProductOverview";
 import ProductOverview from "../../app/components/productOverview/ProductOverview";
 import { SEO } from "../../app/components/SEO";
-import {
-  getADoc,
-  getAllDocs,
-  setDocWithID,
-} from "../../firebase/firestore/write";
+import { setDocWithID } from "../../firebase/firestore/client";
+import { getADoc, getAllDocs } from "../../firebase/firestore/server";
 interface ProductProps {
   product: IProductOverview;
   status: string;
@@ -69,7 +66,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     params: { isNew: "false", id: doc.id },
   }));
   paths.push({ params: { isNew: "true", id: "new" } });
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
@@ -86,8 +83,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   if (context.params?.id) {
     // get products and convert label to be string array
-    await getADoc("products/" + context.params.id).then((doc) => {
-      if (doc.exists()) {
+    await getADoc("products/", context.params.id as string).then((doc) => {
+      if (doc.exists) {
         product = { ...doc.data(), id: doc.id } as IProductOverview;
         if (product.labels) {
           product.labels = product.labels.map((label) => {
