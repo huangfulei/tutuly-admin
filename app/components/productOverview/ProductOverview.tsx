@@ -20,7 +20,7 @@ import { v4 as uuid } from "uuid";
 import { functions, storage } from "../../../firebase/clientApp";
 import { getAllDocs, setDocWithID } from "../../../firebase/firestore/client";
 import { ILabel } from "../labels/ILabel";
-import { IImage, IProductOverview } from "./IProductOverview";
+import { IImage, IProductOverview, IVariant } from "./IProductOverview";
 import ProductImages from "./ProductImages";
 import useLoadingStateStore from "./../../context/loadingStateStore";
 
@@ -30,7 +30,7 @@ interface ProductOverviewProps {
 
 const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const { product } = props;
-  const [newVariantIDs, setNewVariantIDs] = useState<string[]>([]);
+  const [newVariants, setNewVariants] = useState<IVariant[]>([]);
   const { setIsLoading } = useLoadingStateStore();
   const router = useRouter();
   const priceRef = useRef(null);
@@ -99,16 +99,13 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     } else {
       await setDocWithID("products/" + product.id, product, true);
 
-      if (newVariantIDs.length > 0) {
-        product.variants.map(async (variant) => {
-          if (newVariantIDs.some((id) => id === variant.id)) {
-            const updatePrice = httpsCallable(functions, "updatePrice");
-            await updatePrice({
-              product,
-              variant,
-            });
-          }
+      if (newVariants.length > 0) {
+        const updatePrice = httpsCallable(functions, "updatePrice");
+        await updatePrice({
+          product,
+          variants: newVariants,
         });
+        setNewVariants([]);
       }
     }
     setIsLoading(false);
@@ -473,7 +470,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
 
           {/* Variants */}
           {variants.map((variant, index) => {
-            register(`variants.${index}.id`);
+            register(`variants.${index}.id`, { value: variant.id });
             return (
               <div key={variant.id} className="grid sm:col-span-6 space-y-2">
                 {/* Divider */}
@@ -537,12 +534,16 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                         required: true,
                         min: 1,
                       })}
-                      onChange={() => {
-                        const exist = newVariantIDs.some(
-                          (id) => id === variant.id
+                      onChange={(
+                        event: React.ChangeEvent<HTMLInputElement>
+                      ) => {
+                        const exist = newVariants.some(
+                          (item) => item.id === variant.id
                         );
                         if (!exist) {
-                          setNewVariantIDs([...newVariantIDs, variant.id]);
+                          const newVariant = { ...variant };
+                          newVariant.price = Number(event.target.value);
+                          setNewVariants([...newVariants, newVariant]);
                         }
                         // if (product.id !== "new") {
                         //   const updatePrice = httpsCallable(
@@ -555,7 +556,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                         //   });
                         // }
                       }}
-                      className=" focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
+                      className="focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
                     />
                     <div className="self-center ml-1">€</div>
                   </div>
@@ -604,14 +605,13 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                 className="btn btn-primary"
                 onClick={() => {
                   const newVar = {
-                    // id: uuid(),
+                    id: "new",
                     name: "",
                     price: 0,
                     stock: 0,
                     images: [],
                   };
                   appendVariant(newVar);
-                  // setNewVariants([...newVariants, newVar]);
                 }}
               >
                 Add More Variant

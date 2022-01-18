@@ -1,5 +1,5 @@
 import { ArrowNarrowLeftIcon } from "@heroicons/react/outline";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
@@ -63,23 +63,23 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const snap = await getAllDocs("products");
-  const paths: any[] = snap.docs.map((doc) => ({
-    params: { isNew: "false", id: doc.id },
-  }));
-  paths.push({ params: { isNew: "true", id: "new" } });
-  return { paths, fallback: "blocking" };
-};
+// export const getStaticPaths: GetStaticPaths = async () => {
+//   const snap = await getAllDocs("products");
+//   const paths: any[] = snap.docs.map((doc) => ({
+//     params: { isNew: "false", id: doc.id },
+//   }));
+//   paths.push({ params: { isNew: "true", id: "new" } });
+//   return { paths, fallback: "blocking" };
+// };
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   let product: IProductOverview = {
     id: "new",
     status: "Active",
     name: "",
     priority: 0,
     description: "",
-    variants: [{ id: uuid(), name: "", price: 0, stock: 0, images: [] }],
+    variants: [{ id: "new", name: "", price: 0, stock: 0, images: [] }],
   };
 
   let status = "Active";
@@ -101,7 +101,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   return {
     props: { product, status }, // will be passed to the page component as props
-    revalidate: 1,
   };
 };
 
