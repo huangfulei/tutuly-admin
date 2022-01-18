@@ -29,22 +29,7 @@ const Products: React.FunctionComponent<IProducts> = (props) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  const productsRef = collection(db, "products");
-  const q = query(productsRef, orderBy("priority", "desc"));
-  const querySnapshot = await getDocs(q);
-  const products = querySnapshot.docs.map((doc) => {
-    return { ...doc.data(), id: doc.id };
-  });
-
-  return {
-    props: { products }, // will be passed to the page component as props
-    revalidate: 1,
-  };
-};
-
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   // get products by label and order by priority
+// export const getStaticProps: GetStaticProps = async () => {
 //   const productsRef = collection(db, "products");
 //   const q = query(productsRef, orderBy("priority", "desc"));
 //   const querySnapshot = await getDocs(q);
@@ -54,7 +39,22 @@ export const getStaticProps: GetStaticProps = async () => {
 
 //   return {
 //     props: { products }, // will be passed to the page component as props
+//     revalidate: 3,
 //   };
 // };
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  // get products by label and order by priority
+  const productsRef = collection(db, "products");
+  const q = query(productsRef, orderBy("priority", "desc"));
+  const querySnapshot = await getDocs(q);
+  const products = querySnapshot.docs.map((doc) => {
+    return { ...doc.data(), id: doc.id };
+  });
+
+  return {
+    props: { products }, // will be passed to the page component as props
+  };
+};
 
 export default Products;
