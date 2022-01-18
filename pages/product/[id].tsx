@@ -2,14 +2,14 @@ import { ArrowNarrowLeftIcon } from "@heroicons/react/outline";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useState } from "react";
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 import { IProductOverview } from "../../app/components/productOverview/IProductOverview";
 import ProductOverview from "../../app/components/productOverview/ProductOverview";
 import { SEO } from "../../app/components/SEO";
 import {
   getADoc,
   getAllDocs,
-  setDocWithID
+  setDocWithID,
 } from "../../firebase/firestore/client";
 interface ProductProps {
   product: IProductOverview;

@@ -16,7 +16,7 @@ import {
   useFormState,
 } from "react-hook-form";
 import { HiX } from "react-icons/hi";
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuid";
 import { functions, storage } from "../../../firebase/clientApp";
 import { getAllDocs, setDocWithID } from "../../../firebase/firestore/client";
 import { ILabel } from "../labels/ILabel";
