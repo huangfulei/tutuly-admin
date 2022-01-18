@@ -22,6 +22,7 @@ import { getAllDocs, setDocWithID } from "../../../firebase/firestore/write";
 import { ILabel } from "../labels/ILabel";
 import { IImage, IProductOverview } from "./IProductOverview";
 import ProductImages from "./ProductImages";
+import useLoadingStateStore from "./../../context/loadingStateStore";
 
 interface ProductOverviewProps {
   product: IProductOverview;
@@ -30,6 +31,7 @@ interface ProductOverviewProps {
 const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const { product } = props;
   const [newVariantIDs, setNewVariantIDs] = useState<string[]>([]);
+  const { setIsLoading } = useLoadingStateStore();
   const router = useRouter();
   const priceRef = useRef(null);
   const form = useForm<IProductOverview>({
@@ -37,8 +39,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   });
   const {
     register,
-    unregister,
-    getValues,
     setValue,
     control,
     reset,
@@ -82,11 +82,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const onSubmit: SubmitHandler<IProductOverview> = async (
     product: IProductOverview
   ) => {
-    console.log(product);
-
-    router.back();
-    reset();
-
+    setIsLoading(true);
     // map labels to be string array
     if (product.labels) {
       product.labels = product.labels.map((label) => {
@@ -98,27 +94,27 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
 
     if (product.id === "new") {
       // call save product
-      console.log(product);
-
       const addProduct = httpsCallable(functions, "addProduct");
       await addProduct(product);
     } else {
-      // check if has new variant, call function to create new price and update product
-      // const updateProduct = httpsCallable(functions, "updateProduct");
-      // await updateProduct({ product, variantIDs: newVariantIDs });
+      await setDocWithID("products/" + product.id, product, true);
 
-      await setDocWithID("products/" + product.id, product, true).then(() => {
-        product.variants.map((variant) => {
+      if (newVariantIDs.length > 0) {
+        product.variants.map(async (variant) => {
           if (newVariantIDs.some((id) => id === variant.id)) {
             const updatePrice = httpsCallable(functions, "updatePrice");
-            updatePrice({
+            await updatePrice({
               product,
               variant,
             });
           }
         });
-      });
+      }
     }
+    setIsLoading(false);
+
+    router.back();
+    reset();
   };
 
   useEffect(() => {
