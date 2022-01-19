@@ -5,7 +5,7 @@ interface ILoadingState {
   setIsLoading: (isLoading: boolean) => void;
 }
 
-const useLoadingStateStore = create<ILoadingState>((set) => ({
+const useLoadingStateStore = create<ILoadingState>((set: any) => ({
   isLoading: false,
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
 }));

@@ -7,8 +7,8 @@ import {
 import Image from "next/image";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { HiX } from "react-icons/hi";
-import { storage } from "../../../firebase/clientApp";
-import { IImage } from "./IProductOverview";
+import { storage } from "../../../../firebase/clientApp";
+import { IImage } from "../../../types/IProductOverview";
 
 interface ProductImagesProps {
   index: number;

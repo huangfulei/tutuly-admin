@@ -1,7 +1,7 @@
 import { Disclosure } from "@headlessui/react";
 import Link from "next/link";
 import { Router } from "next/router";
-import { classNames } from "../../utils/classNames";
+import { classNames } from "../../../utils/classNames";
 import { NavItem } from "./mockdata";
 
 interface NavbarDesktopProps {

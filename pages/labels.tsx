@@ -1,5 +1,5 @@
-import Labels from "../app/components/labels/Labels";
-import { SEO } from "../app/components/SEO";
+import Labels from "../app/components/modules/labels/Labels";
+import { SEO } from "../app/components/templates/SEO";
 
 interface LabelsProps {}
 

@@ -1,9 +1,9 @@
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { GetServerSideProps } from "next";
 import Link from "next/link";
-import ProductList from "../app/components/productList/ProductList";
-import { SEO } from "../app/components/SEO";
-import { IProductOverview } from "./../app/components/productOverview/IProductOverview";
+import ProductList from "../app/components/modules/productList/ProductList";
+import { SEO } from "../app/components/templates/SEO";
+import { IProductOverview } from "../app/types/IProductOverview";
 import { db } from "./../firebase/clientApp";
 
 interface IProducts {

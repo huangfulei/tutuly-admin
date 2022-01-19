@@ -3,9 +3,9 @@ import { httpsCallable } from "firebase/functions";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { functions } from "../../../firebase/clientApp";
-import useLoadingStateStore from "../../context/loadingStateStore";
-import { IProductOverview } from "../productOverview/IProductOverview";
+import { functions } from "../../../../firebase/clientApp";
+import useLoadingStateStore from "../../../context/loadingStateStore";
+import { IProductOverview } from "../../../types/IProductOverview";
 
 interface ProductListProps {
   products: IProductOverview[];

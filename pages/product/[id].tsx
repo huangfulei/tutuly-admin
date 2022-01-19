@@ -3,9 +3,9 @@ import { GetServerSideProps, GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
-import { IProductOverview } from "../../app/components/productOverview/IProductOverview";
-import ProductOverview from "../../app/components/productOverview/ProductOverview";
-import { SEO } from "../../app/components/SEO";
+import { IProductOverview } from "../../app/types/IProductOverview";
+import ProductOverview from "../../app/components/modules/productOverview/ProductOverview";
+import { SEO } from "../../app/components/templates/SEO";
 import {
   getADoc,
   getAllDocs,
@@ -79,7 +79,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     name: "",
     priority: 0,
     description: "",
-    variants: [{ id: "new", name: "", price: 0, stock: 0, images: [] }],
+    variants: [{ id: uuid(), name: "", price: 0, stock: 0, images: [] }],
   };
 
   let status = "Active";

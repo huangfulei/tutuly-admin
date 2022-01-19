@@ -1,5 +1,3 @@
-import { ILabel } from "../labels/ILabel";
-
 export interface IProductOverview {
   id?: string;
   name: string;

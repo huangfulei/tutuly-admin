@@ -3,8 +3,8 @@ import {
   deleteADoc,
   getAllDocs,
   setDocWithID,
-} from "../../../firebase/firestore/client";
-import { ILabel } from "./ILabel";
+} from "../../../../firebase/firestore/client";
+import { ILabel } from "../../../types/ILabel";
 
 interface LabelsProps {}
 

@@ -17,12 +17,19 @@ import {
 } from "react-hook-form";
 import { HiX } from "react-icons/hi";
 import { v4 as uuid } from "uuid";
-import { functions, storage } from "../../../firebase/clientApp";
-import { getAllDocs, setDocWithID } from "../../../firebase/firestore/client";
-import { ILabel } from "../labels/ILabel";
-import { IImage, IProductOverview, IVariant } from "./IProductOverview";
+import { functions, storage } from "../../../../firebase/clientApp";
+import {
+  getAllDocs,
+  setDocWithID,
+} from "../../../../firebase/firestore/client";
+import { ILabel } from "../../../types/ILabel";
+import {
+  IImage,
+  IProductOverview,
+  IVariant,
+} from "../../../types/IProductOverview";
 import ProductImages from "./ProductImages";
-import useLoadingStateStore from "./../../context/loadingStateStore";
+import useLoadingStateStore from "../../../context/loadingStateStore";
 
 interface ProductOverviewProps {
   product: IProductOverview;
@@ -91,14 +98,11 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     }
     // set priority to be number
     product.priority = Number(product.priority);
-
     if (product.id === "new") {
       // call save product
       const addProduct = httpsCallable(functions, "addProduct");
       await addProduct(product);
     } else {
-      await setDocWithID("products/" + product.id, product, true);
-
       if (newVariants.length > 0) {
         const updatePrice = httpsCallable(functions, "updatePrice");
         await updatePrice({
@@ -106,10 +110,11 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
           variants: newVariants,
         });
         setNewVariants([]);
+      } else {
+        await setDocWithID("products/" + product.id, product, true);
       }
     }
     setIsLoading(false);
-
     router.back();
     reset();
   };
@@ -529,32 +534,25 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                     <input
                       type="number"
                       id="price"
+                      step="0.01"
                       autoComplete="price"
                       {...register(`variants.${index}.price`, {
                         required: true,
-                        min: 1,
+                        min: 0.01,
                       })}
                       onChange={(
                         event: React.ChangeEvent<HTMLInputElement>
                       ) => {
-                        const exist = newVariants.some(
-                          (item) => item.id === variant.id
+                        const newVariant = { ...variant };
+                        newVariant.price = Number(
+                          Number(event.target.value).toFixed(2)
                         );
-                        if (!exist) {
-                          const newVariant = { ...variant };
-                          newVariant.price = Number(event.target.value);
-                          setNewVariants([...newVariants, newVariant]);
-                        }
-                        // if (product.id !== "new") {
-                        //   const updatePrice = httpsCallable(
-                        //     functions,
-                        //     "updatePrice"
-                        //   );
-                        //   updatePrice({
-                        //     product,
-                        //     variant: getValues(`variants.${index}`),
-                        //   });
-                        // }
+                        setNewVariants([
+                          ...newVariants.filter(
+                            (item) => item.id !== newVariant.id
+                          ),
+                          newVariant,
+                        ]);
                       }}
                       className="focus:ring-indigo-500 focus:border-indigo-500 w-full min-w-0  rounded-md sm:text-sm border-gray-300"
                     />
@@ -605,7 +603,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                 className="btn btn-primary"
                 onClick={() => {
                   const newVar = {
-                    id: "new",
+                    id: uuid(),
                     name: "",
                     price: 0,
                     stock: 0,
