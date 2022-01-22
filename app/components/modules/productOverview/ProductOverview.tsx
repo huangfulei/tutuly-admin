@@ -1,11 +1,4 @@
 import { httpsCallable } from "firebase/functions";
-import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadBytes,
-} from "firebase/storage";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -17,19 +10,17 @@ import {
 } from "react-hook-form";
 import { HiX } from "react-icons/hi";
 import { v4 as uuid } from "uuid";
-import { functions, storage } from "../../../../firebase/clientApp";
+import { functions } from "../../../../firebase/clientApp";
 import {
   getAllDocs,
   setDocWithID,
 } from "../../../../firebase/firestore/client";
-import { ILabel } from "../../../types/ILabel";
-import {
-  IImage,
-  IProductOverview,
-  IVariant,
-} from "../../../types/IProductOverview";
-import ProductImages from "./ProductImages";
 import useLoadingStateStore from "../../../context/loadingStateStore";
+import { IImage } from "../../../types/IImage";
+import { ILabel } from "../../../types/ILabel";
+import { IProductOverview, IVariant } from "../../../types/IProductOverview";
+import ImageUpload from "../../elements/ImageUpload";
+import ProductImages from "./ProductImages";
 
 interface ProductOverviewProps {
   product: IProductOverview;
@@ -267,135 +258,30 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
           </div>
 
           {/* Pictures */}
-          <div className="sm:col-span-6">
-            <label
+          <div className="sm:col-span-6 relative w-32 h-32">
+            {/* <label
               htmlFor="pictures"
               className="block text-sm font-medium text-gray-700"
             >
               Main Picture
-            </label>
+            </label> */}
+
+            <ImageUpload
+              limit={1}
+              location={"products/"}
+              images={mainImage ? [mainImage] : undefined}
+              onUploadFinished={(image) => {
+                setValue("mainImage", image, {
+                  shouldDirty: true,
+                });
+                setMainImage(image);
+              }}
+              onRemoveFinished={() => {
+                resetField("mainImage");
+                setMainImage(undefined);
+              }}
+            />
           </div>
-          {mainImage ? (
-            <div className="indicator">
-              {/* <div className="indicator-item badge badge-secondary"></div> */}
-              <HiX
-                className="indicator-item inline-block w-4 h-4 mr-2 stroke-current hover:cursor-pointer"
-                onClick={() => {
-                  // Create a reference to the file to delete
-                  const desertRef = ref(storage, "products/" + mainImage.name);
-
-                  // Delete the file
-                  deleteObject(desertRef)
-                    .then(() => {
-                      // File deleted successfully
-                      // reset to default value
-                      resetField("mainImage");
-                      setMainImage(undefined);
-                    })
-                    .catch((error) => {
-                      // Uh-oh, an error occurred!
-                    });
-                }}
-              />
-              <Image
-                className="grid w-32 h-32 bg-base-300 place-items-center"
-                src={mainImage.src}
-                alt="Picture of the author"
-                width={200}
-                height={200}
-              />
-            </div>
-          ) : (
-            <div className="sm:col-span-6">
-              {/* Add Pictures */}
-              <Image
-                className="grid w-32 h-32 bg-base-300 place-items-center"
-                src={
-                  "https://firebasestorage.googleapis.com/v0/b/tutuly-6acc2.appspot.com/o/app%2Fphoto-placeholder.png?alt=media&token=fb552a6b-bbc7-4f91-a885-4edd95f52579"
-                }
-                alt="Picture of the author"
-                width={200}
-                height={200}
-              />
-              <label
-                htmlFor="cover-photo"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Add main picture
-              </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    stroke="currentColor"
-                    fill="none"
-                    viewBox="0 0 48 48"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <div className="flex text-sm text-gray-600">
-                    <label
-                      htmlFor={"mainImage"}
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                    >
-                      <span>Upload main Picture</span>
-                      <input
-                        type="file"
-                        id={"mainImage"}
-                        className="sr-only"
-                        onChange={async (
-                          event: React.ChangeEvent<HTMLInputElement>
-                        ) => {
-                          const images = event.target.files;
-
-                          if (images && images.length > 0) {
-                            const imageName = images[0].name;
-                            const storageRef = ref(
-                              storage,
-                              "products/" + imageName
-                            );
-
-                            //   'file' comes from the Blob or File API
-                            await uploadBytes(storageRef, images[0]).then(
-                              (snapshot) => {
-                                getDownloadURL(storageRef)
-                                  .then((url) => {
-                                    // `url` is the download URL for 'images/stars.jpg'
-                                    const image: IImage = {
-                                      name: imageName,
-                                      src: url,
-                                      alt: imageName,
-                                    };
-
-                                    setValue("mainImage", image, {
-                                      shouldDirty: true,
-                                    });
-                                    setMainImage(image);
-                                  })
-                                  .catch((error) => {
-                                    // Handle any errors
-                                  });
-                              }
-                            );
-                          }
-                        }}
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG, GIF up to 10MB
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
           <div
             className={mainImage ? "hidden" : "text-red-500 text-xs italic "}
           >
@@ -592,7 +478,9 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                 </div>
 
                 {/* Images */}
-                <ProductImages index={index} />
+                <div className="sm:col-span-6 relative">
+                  <ProductImages index={index} />
+                </div>
               </div>
             );
           })}

@@ -19,9 +19,7 @@ const Products: React.FunctionComponent<IProducts> = (props) => {
         <h1 className="text-2xl font-semibold text-gray-900">All Products</h1>
 
         <Link href="/product/new" passHref>
-          <button className="bg-indigo-600 mb-2 rounded-md py-2 px-4  font-medium text-white hover:bg-indigo-700 focus:outline-none ">
-            Add new
-          </button>
+          <button className="btn btn-primary">Add new</button>
         </Link>
       </div>
       <ProductList products={products} />

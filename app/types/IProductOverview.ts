@@ -1,3 +1,4 @@
+import { IImage } from "./IImage";
 export interface IProductOverview {
   id?: string;
   name: string;
@@ -22,10 +23,4 @@ export interface IVariant {
 export interface IDetail {
   title: string;
   detail: string;
-}
-
-export interface IImage {
-  name: string;
-  src: string;
-  alt: string;
 }
