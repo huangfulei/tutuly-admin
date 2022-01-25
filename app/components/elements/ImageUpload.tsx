@@ -125,7 +125,7 @@ const ImageUpload: React.FunctionComponent<ImageUploadProps> = (props) => {
             onClick={() => removeImage(uploadedImg, index)}
           />
           <Image
-            className="rounded-md h-full w-full"
+            className="rounded-md"
             src={uploadedImg.src}
             alt={uploadedImg.alt}
             layout="fill"

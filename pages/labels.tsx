@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   // get all labels
   const querySnapshot = await getAllDocs("labels");
   const labels = querySnapshot.docs.map((doc) => {
-    return doc.data();
+    return { ...doc.data(), id: doc.id };
   });
 
   return {

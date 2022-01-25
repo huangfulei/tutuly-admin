@@ -1,9 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
+import { TrashIcon, XIcon } from "@heroicons/react/outline";
 import Image from "next/image";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFormState } from "react-hook-form";
 import {
+  addDocWithAutoID,
   deleteADoc,
   setDocWithID,
 } from "../../../../firebase/firestore/client";
@@ -11,6 +12,7 @@ import { IImage } from "../../../types/IImage";
 import { ILabel } from "../../../types/ILabel";
 import ImageUpload from "../../elements/ImageUpload";
 import SlideOverLayout from "../../layouts/SlideOverLayout";
+import Loading from "./../../elements/Loading";
 interface LabelsProps {
   labels: ILabel[];
   open: boolean;
@@ -25,16 +27,17 @@ const Labels: React.FunctionComponent<LabelsProps> = (props) => {
     setValue,
     unregister,
     reset,
+    control,
     formState: { errors },
     handleSubmit,
   } = useForm();
+  const { isValid } = useFormState({ control });
 
   const onsubmit = async (data: ILabel) => {
+    const docRef = await addDocWithAutoID(`labels/`, data);
+    data.id = docRef.id;
     console.log(data);
 
-    // const value = input.current!.value;
-    // // todo: check if value already in use
-    await setDocWithID(`labels/${data.name}`, data);
     setLabels([...labels, data]);
     setOpen(false);
     reset();
@@ -42,7 +45,7 @@ const Labels: React.FunctionComponent<LabelsProps> = (props) => {
 
   const onRemove = async (label: ILabel) => {
     // todo: check if the label has been referenced before deleting
-    await deleteADoc(`labels/${label.name}`);
+    await deleteADoc(`labels/${label.id}`);
     setLabels([
       ...labels.filter((existingLabel) => existingLabel.name !== label.name),
     ]);
@@ -55,16 +58,16 @@ const Labels: React.FunctionComponent<LabelsProps> = (props) => {
   return (
     <>
       {/* Add and edit labels */}
-      <SlideOverLayout open={open} setOpen={setOpen}>
+      <SlideOverLayout title="New Label" open={open} setOpen={setOpen}>
         <form
           onSubmit={handleSubmit(onsubmit)}
-          className="flex flex-col space-y-2 items-center"
+          className="relative w-96 h-96 flex flex-col space-y-2"
         >
           <ImageUpload
             limit={1}
             location="labels/"
-            width={"64"}
-            height={"64"}
+            // width={"80"}
+            // height={"80"}
             onUploadFinished={(image: IImage) => {
               register("image");
               setValue("image", image);
@@ -89,27 +92,30 @@ const Labels: React.FunctionComponent<LabelsProps> = (props) => {
 
       {/* Display labels */}
       <ul role="list" className="my-2 flex flex-wrap">
-        {labels.map((label) => (
+        {labels.map((label: ILabel) => (
           <li key={label.name} className="flex flex-col items-center mr-2 mb-5">
             <div className="relative w-32 h-32 rounded-lg bg-gray-100 md:w-64 md:h-64">
-              <ImageUpload
-                limit={1}
-                images={label.image ? [label.image] : undefined}
-                location="labels/"
-                onUploadFinished={(image: IImage) => {
-                  register("image");
-                  setValue("image", image);
-                }}
-                onRemoveFinished={() => {
-                  unregister("image");
-                }}
-              />
-              <button
-                type="button"
-                className="absolute inset-0 focus:outline-none"
-              >
-                <span className="sr-only">View details for {label.name}</span>
-              </button>
+              {label.image ? (
+                <ImageUpload
+                  limit={1}
+                  images={label.image ? [label.image] : undefined}
+                  location="labels/"
+                  onUploadFinished={(image: IImage) => {
+                    register("image");
+                    setValue("image", image);
+                  }}
+                  onRemoveFinished={() => {
+                    onRemove(label);
+                  }}
+                />
+              ) : (
+                <TrashIcon
+                  className={
+                    "text-red-600 h-full w-full absolute z-10 opacity-0 hover:opacity-80 hover:cursor-pointer"
+                  }
+                  onClick={() => onRemove(label)}
+                />
+              )}
             </div>
             <p className="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
               {label.name}

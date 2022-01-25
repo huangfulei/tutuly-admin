@@ -22,12 +22,10 @@ export const navigation: NavItem[] = [
     children: [
       { name: "All products", href: "/products" },
       { name: "Labels", href: "/labels" },
-      { name: "Calendar", href: "/" },
-      { name: "Settings", href: "/" },
     ],
     href: "#",
   },
-  { name: "Projects", href: "#", icon: FolderIcon },
+  { name: "Menu", href: "/menu", icon: FolderIcon },
   { name: "Calendar", href: "#", icon: CalendarIcon },
   { name: "Documents", href: "#", icon: InboxIcon },
   { name: "Reports", href: "#", icon: ChartBarIcon },

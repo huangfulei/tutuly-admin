@@ -21,6 +21,7 @@ import { ILabel } from "../../../types/ILabel";
 import { IProductOverview, IVariant } from "../../../types/IProductOverview";
 import ImageUpload from "../../elements/ImageUpload";
 import ProductImages from "./ProductImages";
+import { ILabel } from "./../../../types/ILabel";
 
 interface ProductOverviewProps {
   product: IProductOverview;
@@ -112,10 +113,11 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
 
   useEffect(() => {
     // set labels from DB
-    getAllDocs("labels").then((docs) => {
-      docs.forEach((doc) => {
-        setLabels((prevLabels) => [...prevLabels, doc.data() as ILabel]);
-      });
+    getAllDocs("labels").then((snap) => {
+      const labels = snap.docs.map(
+        (doc) => ({ ...doc.data(), id: doc.id } as ILabel)
+      );
+      setLabels(labels);
     });
 
     // register main Image for the form(in additional to the product object)
@@ -237,7 +239,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                   {labels.map((label) => {
                     return (
                       <li
-                        key={label.name}
+                        key={label.id}
                         onClick={() => {
                           if (
                             !selectedLabels.some(

@@ -1,9 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { XIcon } from "@heroicons/react/outline";
-import { Fragment, ReactNode, useState } from "react";
+import { Fragment, ReactNode } from "react";
 
 interface SlideOverLayoutProps {
   children: ReactNode;
+  title: string;
   open: boolean;
   setOpen: (isOpen: boolean) => void;
 }
@@ -11,12 +12,12 @@ interface SlideOverLayoutProps {
 const SlideOverLayout: React.FunctionComponent<SlideOverLayoutProps> = (
   props
 ) => {
-  const { children, open, setOpen } = props;
+  const { children, title, open, setOpen } = props;
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 overflow-hidden"
+        className="fixed inset-0 overflow-hidden z-10"
         onClose={setOpen}
       >
         <div className="absolute inset-0 overflow-hidden">
@@ -38,7 +39,7 @@ const SlideOverLayout: React.FunctionComponent<SlideOverLayoutProps> = (
                     <div className="px-4 sm:px-6">
                       <div className="flex items-start justify-between">
                         <Dialog.Title className="text-lg font-medium text-gray-900">
-                          New Label
+                          {title}
                         </Dialog.Title>
                         <div className="ml-3 h-7 flex items-center">
                           <button
