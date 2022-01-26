@@ -20,7 +20,7 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
   const { open, setOpen, navItem, onSave, onDelete } = props;
   const [allLabels, setAllLabels] = useState<ILabel[]>([]);
   const pageNameRef = useRef<HTMLInputElement>(null);
-  const [newNavItem, setNewNavItem] = useState<INavItem>(navItem);
+  const [newNavItem, setNewNavItem] = useState<INavItem>({ ...navItem });
 
   const getAllLabels = async () => {
     // get all labels
@@ -31,16 +31,17 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
     setAllLabels(labels);
   };
 
+  //triggered when edit a different item or open
   useEffect(() => {
-    setNewNavItem(navItem);
-  }, [navItem]);
+    setNewNavItem({ ...navItem });
+  }, [navItem, open]);
 
   useEffect(() => {
     getAllLabels();
   }, []);
 
-  return navItem.isPage ? (
-    <SlideOverLayout title="New Page" open={open} setOpen={setOpen}>
+  return newNavItem.isPage ? (
+    <SlideOverLayout title="Page" open={open} setOpen={setOpen}>
       <div className="flex flex-col space-y-2">
         <input
           ref={pageNameRef}
@@ -48,11 +49,17 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
           defaultValue={newNavItem.name}
           placeholder="Page Name"
           className="w-full input input-primary input-bordered"
+          onChange={(event) => {
+            newNavItem.name = event.target.value;
+            setNewNavItem({ ...newNavItem });
+            console.log(newNavItem);
+          }}
         />
         <button
           className="btn btn-primary"
+          disabled={newNavItem.name === ""}
           onClick={() => {
-            newNavItem.name = pageNameRef.current!.value;
+            // newNavItem.name = pageNameRef.current!.valu
             onSave(newNavItem);
             setOpen(false);
           }}
@@ -61,6 +68,7 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
         </button>
         <button
           className="btn btn-error"
+          disabled={newNavItem.name === ""}
           onClick={() => {
             onDelete(newNavItem);
             setOpen(false);
@@ -71,14 +79,13 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
       </div>
     </SlideOverLayout>
   ) : (
-    <SlideOverLayout title="New NavItem" open={open} setOpen={setOpen}>
+    <SlideOverLayout title="NavItem" open={open} setOpen={setOpen}>
       <div className="flex flex-col space-y-2">
         <SelectMenu
           items={allLabels}
           title="Item Name"
           defaultValue={newNavItem.name}
           onSelected={(value) => {
-            newNavItem.id = uuid();
             newNavItem.name = value.name;
             newNavItem.isPage = false;
             newNavItem.label = value;
@@ -94,7 +101,7 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
               id: uuid(),
               name: value.name,
               position: 999,
-              level: navItem.level + 1,
+              level: newNavItem.level + 1,
               isPage: false,
               label: value,
             };
@@ -128,7 +135,7 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
         ))}
 
         {/* Features */}
-        {navItem.level === 1 ? (
+        {newNavItem.level === 1 ? (
           <SelectMenu
             items={allLabels}
             title="Featured"
@@ -162,11 +169,17 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
             key={item.name}
             className="w-fit"
             name={item.name}
-            onRemove={(name) => {}}
+            onRemove={() => {
+              newNavItem.features = newNavItem.features?.filter((navItem) => {
+                if (item.id !== navItem.id) return navItem;
+              });
+              setNewNavItem({ ...newNavItem });
+            }}
           />
         ))}
         <button
           className="btn btn-primary"
+          disabled={newNavItem.name === ""}
           onClick={() => {
             onSave(newNavItem);
             setOpen(false);
@@ -176,6 +189,7 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
         </button>
         <button
           className="btn btn-error"
+          disabled={newNavItem.name === ""}
           onClick={() => {
             onDelete(newNavItem);
             setOpen(false);

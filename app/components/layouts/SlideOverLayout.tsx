@@ -59,7 +59,7 @@ const SlideOverLayout: React.FunctionComponent<SlideOverLayoutProps> = (
                       {/* /End replace */}
                     </div>
                   </div>
-                  <div className="flex-shrink-0 px-4 py-4 flex justify-end space-x-2">
+                  {/* <div className="flex-shrink-0 px-4 py-4 flex justify-end space-x-2">
                     <button
                       type="button"
                       className="btn btn-ghost"
@@ -70,7 +70,7 @@ const SlideOverLayout: React.FunctionComponent<SlideOverLayoutProps> = (
                     <button type="submit" className="btn btn-primary">
                       Save
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </Transition.Child>

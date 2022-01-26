@@ -54,8 +54,6 @@ const MenuPage: React.FunctionComponent<MenuProps> = () => {
     if (navItem.level === 1) {
       // update existing item
       if (navItems.some((item) => item.id === navItem.id)) {
-        console.log("saving old item");
-
         await setDocWithID(`navItems/${navItem.id}`, navItem);
         setNavItems([
           ...navItems.map((item) => {
@@ -69,8 +67,6 @@ const MenuPage: React.FunctionComponent<MenuProps> = () => {
       } else {
         const docRef = await addDocWithAutoID("navItems/", navItem);
         navItem.id = docRef.id;
-        console.log("saving new item");
-
         setNavItems([...navItems, navItem]);
       }
       // add level 3 item

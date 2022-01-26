@@ -7,7 +7,9 @@ import {
 } from "react-beautiful-dnd";
 import { setDocWithID } from "../../../../firebase/firestore/client";
 import { INavItem } from "../../../types/INavItem";
-
+import { MdOutlineCategory } from "react-icons/md";
+import { RiPagesLine } from "react-icons/ri";
+import { BsStars } from "react-icons/bs";
 interface MenuProps {
   navItems: INavItem[];
   setNavItems: (any: any) => void;
@@ -78,127 +80,175 @@ const Menu: React.FunctionComponent<MenuProps> = (props) => {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable" type="-1">
-        {(provided, snapshot) => (
-          <ul
-            ref={provided.innerRef}
-            className="divide-y divide-gray-300 menu w-full p-3 border bg-base-100 rounded-box"
-          >
-            {navItems.map((lev1Item, lev1Index) => (
-              <Draggable
-                key={lev1Item.id}
-                draggableId={`${lev1Item.id}`}
-                index={lev1Index}
-              >
-                {(provided, snapshot) => (
-                  <li
-                    ref={provided.innerRef}
-                    {...provided.dragHandleProps}
-                    {...provided.draggableProps}
-                  >
-                    <a className="flex justify-between">
-                      <div>{lev1Item.name}</div>
-                      <button
-                        className="btn btn-primary"
-                        onClick={(event) => {
-                          // event.isPropagationStopped();
-                          setSelectedNav(lev1Item);
-                          setLev1Pos(lev1Index);
-                          setOpenMenuSlideOver(true);
-                        }}
-                      >
-                        Edit
-                      </button>
-                    </a>
-
-                    <Droppable droppableId={lev1Item.id} type={`${lev1Index}`}>
-                      {(provided, snapshot) => (
-                        <ul
-                          className="divide-y divide-gray-300 menu"
-                          ref={provided.innerRef}
-                        >
-                          {lev1Item.navItems?.map((lev2Item, lev2Index) => {
-                            return (
-                              <Draggable
-                                key={`${lev1Index}${lev2Index}`}
-                                draggableId={`${lev1Index}${lev2Index}`}
-                                index={lev2Index}
+    <>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable" type="-1">
+          {(provided, snapshot) => (
+            <ul
+              ref={provided.innerRef}
+              className="divide-y divide-gray-300 menu w-full p-3 border bg-base-100 rounded-box"
+            >
+              {navItems.map((lev1Item, lev1Index) => (
+                <Draggable
+                  key={lev1Item.id}
+                  draggableId={`${lev1Item.id}`}
+                  index={lev1Index}
+                >
+                  {(provided, snapshot) => (
+                    <li
+                      ref={provided.innerRef}
+                      {...provided.dragHandleProps}
+                      {...provided.draggableProps}
+                    >
+                      <a className="flex justify-between">
+                        {lev1Item.isPage ? (
+                          <div className="flex text-blue-500 items-center">
+                            <RiPagesLine /> {lev1Item.name}
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <div className="flex text-green-500 items-center">
+                              <MdOutlineCategory /> {lev1Item.name}
+                            </div>
+                            {lev1Item.features?.map((item) => (
+                              <div
+                                key={item.id}
+                                className="flex text-yellow-500 items-center"
                               >
-                                {(provided, snapshot) => (
-                                  <li
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <a className="flex justify-between">
-                                      {lev2Item.name}
-                                      <button
-                                        className="btn btn-primary"
-                                        onClick={(event) => {
-                                          // event.isPropagationStopped();
-                                          setSelectedNav(lev2Item);
-                                          setLev1Pos(lev1Index);
-                                          setLev2Pos(lev2Index);
-                                          setOpenMenuSlideOver(true);
-                                        }}
-                                      >
-                                        Edit
-                                      </button>
-                                    </a>
-                                    <Droppable
-                                      droppableId={lev2Item.id}
-                                      direction="horizontal"
-                                      type={`${lev1Index}-${lev2Index}`}
+                                <BsStars /> {item.name}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <button
+                          className="btn btn-primary"
+                          onClick={(event) => {
+                            // event.isPropagationStopped();
+                            setSelectedNav(lev1Item);
+                            setLev1Pos(lev1Index);
+                            setOpenMenuSlideOver(true);
+                          }}
+                        >
+                          Edit
+                        </button>
+                      </a>
+
+                      <Droppable
+                        droppableId={lev1Item.id}
+                        type={`${lev1Index}`}
+                      >
+                        {(provided, snapshot) => (
+                          <ul
+                            className="divide-y divide-gray-300 menu"
+                            ref={provided.innerRef}
+                          >
+                            {lev1Item.navItems?.map((lev2Item, lev2Index) => {
+                              return (
+                                <Draggable
+                                  key={`${lev1Index}${lev2Index}`}
+                                  draggableId={`${lev1Index}${lev2Index}`}
+                                  index={lev2Index}
+                                >
+                                  {(provided, snapshot) => (
+                                    <li
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
                                     >
-                                      {(provided, snapshot) => (
-                                        <ul
-                                          className="flex divide-x divide-gray-300"
-                                          ref={provided.innerRef}
+                                      <a className="flex justify-between">
+                                        {lev2Item.isPage ? (
+                                          <div className="flex text-blue-500 items-center">
+                                            <RiPagesLine /> {lev2Item.name}
+                                          </div>
+                                        ) : (
+                                          <div className="flex text-green-500 items-center">
+                                            <MdOutlineCategory />
+                                            {lev2Item.name}
+                                          </div>
+                                        )}
+                                        <button
+                                          className="btn btn-primary"
+                                          onClick={(event) => {
+                                            // event.isPropagationStopped();
+                                            setSelectedNav(lev2Item);
+                                            setLev1Pos(lev1Index);
+                                            setLev2Pos(lev2Index);
+                                            setOpenMenuSlideOver(true);
+                                          }}
                                         >
-                                          {lev2Item.navItems?.map(
-                                            (lev3Item, lev3Index) => {
-                                              return (
-                                                <Draggable
-                                                  key={`${lev1Index}${lev2Index}${lev3Index}`}
-                                                  draggableId={`${lev1Index}${lev2Index}${lev3Index}`}
-                                                  index={lev3Index}
-                                                >
-                                                  {(provided, snapshot) => (
-                                                    <li
-                                                      ref={provided.innerRef}
-                                                      {...provided.draggableProps}
-                                                      {...provided.dragHandleProps}
-                                                    >
-                                                      <a>{lev3Item.name}</a>
-                                                    </li>
-                                                  )}
-                                                </Draggable>
-                                              );
-                                            }
-                                          )}
-                                          {provided.placeholder}
-                                        </ul>
-                                      )}
-                                    </Droppable>
-                                  </li>
-                                )}
-                              </Draggable>
-                            );
-                          })}
-                          {provided.placeholder}
-                        </ul>
-                      )}
-                    </Droppable>
-                  </li>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </ul>
-        )}
-      </Droppable>
-    </DragDropContext>
+                                          Edit
+                                        </button>
+                                      </a>
+                                      <Droppable
+                                        droppableId={lev2Item.id}
+                                        direction="horizontal"
+                                        type={`${lev1Index}-${lev2Index}`}
+                                      >
+                                        {(provided, snapshot) => (
+                                          <ul
+                                            className="flex divide-x divide-gray-300"
+                                            ref={provided.innerRef}
+                                          >
+                                            {lev2Item.navItems?.map(
+                                              (lev3Item, lev3Index) => {
+                                                return (
+                                                  <Draggable
+                                                    key={`${lev1Index}${lev2Index}${lev3Index}`}
+                                                    draggableId={`${lev1Index}${lev2Index}${lev3Index}`}
+                                                    index={lev3Index}
+                                                  >
+                                                    {(provided, snapshot) => (
+                                                      <li
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                      >
+                                                        <a>
+                                                          <div className="flex text-green-500 items-center">
+                                                            <MdOutlineCategory />
+                                                            {lev3Item.name}
+                                                          </div>
+                                                        </a>
+                                                      </li>
+                                                    )}
+                                                  </Draggable>
+                                                );
+                                              }
+                                            )}
+                                            {provided.placeholder}
+                                          </ul>
+                                        )}
+                                      </Droppable>
+                                    </li>
+                                  )}
+                                </Draggable>
+                              );
+                            })}
+                            {provided.placeholder}
+                          </ul>
+                        )}
+                      </Droppable>
+                    </li>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </ul>
+          )}
+        </Droppable>
+      </DragDropContext>
+      <div className="flex items-center space-x-2">
+        <div className="flex text-blue-500 items-center">
+          <RiPagesLine /> - Pages
+        </div>
+        <div className="flex text-green-500 items-center">
+          <MdOutlineCategory /> - Categories
+        </div>
+        <div className="flex text-yellow-500 items-center">
+          <BsStars /> - Featured
+        </div>
+      </div>
+    </>
   );
 };
 
