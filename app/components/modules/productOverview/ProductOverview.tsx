@@ -21,7 +21,6 @@ import { ILabel } from "../../../types/ILabel";
 import { IProductOverview, IVariant } from "../../../types/IProductOverview";
 import ImageUpload from "../../elements/ImageUpload";
 import ProductImages from "./ProductImages";
-import { ILabel } from "./../../../types/ILabel";
 
 interface ProductOverviewProps {
   product: IProductOverview;
@@ -39,6 +38,8 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   const {
     register,
     setValue,
+    getValues,
+    watch,
     control,
     reset,
     resetField,
@@ -61,15 +62,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
   });
 
   const {
-    fields: selectedLabels,
-    append: appendLabel,
-    remove: removeLabel,
-  } = useFieldArray({
-    control,
-    name: "labels",
-  });
-
-  const {
     fields: variants,
     append: appendVariant,
     remove: removeVariant,
@@ -82,12 +74,6 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     product: IProductOverview
   ) => {
     setIsLoading(true);
-    // map labels to be string array
-    if (product.labels) {
-      product.labels = product.labels.map((label) => {
-        return label.name;
-      });
-    }
     // set priority to be number
     product.priority = Number(product.priority);
     if (product.id === "new") {
@@ -103,7 +89,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
         });
         setNewVariants([]);
       } else {
-        await setDocWithID("products/" + product.id, product, true);
+        await setDocWithID("products/" + product.id, product);
       }
     }
     setIsLoading(false);
@@ -213,14 +199,22 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
             <div className="flex justify-between">
               {/* Display labels */}
               <div className="flex flex-wrap space-x-2 my-2">
-                {selectedLabels.map((label, index) => {
+                {Object.keys(watch("labels") || []).map((label, index) => {
                   return (
-                    <div key={label.id} className="badge badge-accent p-4 mb-2">
+                    <div key={label} className="badge badge-accent p-4 mb-2">
                       <HiX
                         className="inline-block w-4 h-4 mr-2 stroke-current hover:cursor-pointer"
-                        onClick={() => removeLabel(index)}
+                        onClick={() => {
+                          const existingLabels = getValues("labels");
+                          if (existingLabels && existingLabels[label]) {
+                            delete existingLabels[label];
+                            setValue("labels", existingLabels, {
+                              shouldDirty: true,
+                            });
+                          }
+                        }}
                       />
-                      <div>{label.name}</div>
+                      <div>{label}</div>
                     </div>
                   );
                 })}
@@ -241,13 +235,20 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                       <li
                         key={label.id}
                         onClick={() => {
-                          if (
-                            !selectedLabels.some(
-                              (selectedLabel) =>
-                                selectedLabel.name === label.name
-                            )
-                          )
-                            appendLabel(label);
+                          const existingLabels = getValues("labels");
+                          // add label only when not existing
+                          if (existingLabels && !existingLabels[label.name]) {
+                            existingLabels[label.name] = "true";
+                            setValue("labels", existingLabels, {
+                              shouldDirty: true,
+                            });
+                          } else {
+                            setValue(
+                              "labels",
+                              { [label.name]: "true" },
+                              { shouldDirty: true }
+                            );
+                          }
                         }}
                       >
                         <a>{label.name}</a>

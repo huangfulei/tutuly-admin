@@ -6,7 +6,7 @@ export interface IProductOverview {
   status: string;
   mainImage?: IImage;
   rating?: number;
-  labels?: any[];
+  labels?: { [index: string]: string };
   description: string;
   details?: IDetail[];
   variants: IVariant[];

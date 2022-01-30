@@ -89,11 +89,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     await getADoc("products/" + context.params.id).then((doc) => {
       if (doc.exists()) {
         product = { ...doc.data(), id: doc.id } as IProductOverview;
-        if (product.labels) {
-          product.labels = product.labels.map((label) => {
-            return { name: label };
-          });
-        }
         status = product.status;
       }
     });
