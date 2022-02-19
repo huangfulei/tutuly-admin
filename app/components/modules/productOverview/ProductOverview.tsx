@@ -1,6 +1,11 @@
+import { convertFromRaw, convertToRaw, RawDraftContentState } from "draft-js";
 import { httpsCallable } from "firebase/functions";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
+// install @types/draft-js @types/react-draft-wysiwyg and @types/draft-js @types/react-draft-wysiwyg for types
+import { EditorProps } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import {
   FormProvider,
   SubmitHandler,
@@ -21,6 +26,11 @@ import { ILabel } from "../../../types/ILabel";
 import { IProductOverview, IVariant } from "../../../types/IProductOverview";
 import ImageUpload from "../../elements/ImageUpload";
 import ProductImages from "./ProductImages";
+
+const Editor = dynamic<EditorProps>(
+  () => import("react-draft-wysiwyg").then((mod) => mod.Editor),
+  { ssr: false }
+);
 
 interface ProductOverviewProps {
   product: IProductOverview;
@@ -96,6 +106,26 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
     router.back();
     reset();
   };
+
+  // draft js logic
+  // get initial
+  const content = {
+    entityMap: {},
+    blocks: [
+      {
+        key: "637gr",
+        text: "",
+        type: "unstyled",
+        depth: 0,
+        inlineStyleRanges: [],
+        entityRanges: [],
+        data: {},
+      },
+    ],
+  };
+
+  const initialState = convertFromRaw(content);
+  const raw = convertToRaw(initialState);
 
   useEffect(() => {
     // set labels from DB
@@ -335,12 +365,16 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
                         Details
                       </label>
                       <div className="mt-1">
-                        <textarea
-                          id={"detail" + index}
-                          rows={3}
-                          {...register(`details.${index}.detail`)}
-                          className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                          defaultValue={""}
+                        <Editor
+                          defaultContentState={convertToRaw(
+                            convertFromRaw(info.detail)
+                          )}
+                          toolbarClassName="toolbarClassName"
+                          wrapperClassName="wrapperClassName"
+                          editorClassName="editorClassName"
+                          onContentStateChange={(content) => {
+                            setValue(`details.${index}.detail`, content);
+                          }}
                         />
                       </div>
                     </div>
@@ -353,7 +387,11 @@ const ProductOverview: React.FC<ProductOverviewProps> = (props) => {
               <div
                 className="btn btn-primary"
                 onClick={() => {
-                  const newInfo = { id: uuid(), title: "", detail: "" };
+                  const newInfo = {
+                    id: uuid(),
+                    title: "",
+                    detail: content as RawDraftContentState,
+                  };
                   appendDetail(newInfo);
                 }}
               >

@@ -1,4 +1,5 @@
 import { IImage } from "./IImage";
+import { RawDraftContentState } from "draft-js";
 export interface IProductOverview {
   id?: string;
   name: string;
@@ -22,5 +23,5 @@ export interface IVariant {
 
 export interface IDetail {
   title: string;
-  detail: string;
+  detail: RawDraftContentState;
 }
