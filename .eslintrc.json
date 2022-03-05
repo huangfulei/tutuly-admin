@@ -1,3 +1,62 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "prefer-const": "error",
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "eqeqeq": "warn",
+    "curly": "error",
+    "no-console": "error",
+    "quotes": ["error", "double"],
+    "import/order": [
+      "error",
+      {
+        "alphabetize": { "order": "asc", "caseInsensitive": false },
+        "newlines-between": "always"
+      }
+    ],
+    "import/no-duplicates": "error",
+    "import/no-nodejs-modules": "error",
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "ComponentFramework",
+        "message": "Use local parameter instead."
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ClassDeclaration > MemberExpression.superClass[object.type='Identifier'][object.name='React'][property.type='Identifier'][property.name='PureComponent']",
+        "message": "Use React.FC instead"
+      },
+      {
+        "selector": "ClassDeclaration > MemberExpression.superClass[object.type='Identifier'][object.name='React'][property.type='Identifier'][property.name='Component']",
+        "message": "Use React.FC instead"
+      },
+      {
+        "selector": "ClassDeclaration[superClass.name='PureComponent']",
+        "message": "Use Functional Component instead"
+      },
+      {
+        "selector": "ClassDeclaration[superClass.name='Component']",
+        "message": "Use Functional Component instead"
+      },
+      {
+        "selector": "ImportDeclaration[importKind!='type'][source.value='@microsoft/teams-js']",
+        "message": "Only type imports are allowed from '@microsoft/teams-js'."
+      }
+    ],
+    "react/forbid-component-props": [
+      "error",
+      {
+        "forbid": ["style", "styles"]
+      }
+    ],
+    "react/jsx-fragments": "error",
+    "react/jsx-no-useless-fragment": "error",
+    "react/prop-types": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
+  }
 }

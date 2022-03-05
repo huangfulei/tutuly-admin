@@ -1,7 +1,7 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { getApp, getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
 import { getFunctions } from "firebase/functions";
+import { getStorage } from "firebase/storage";
 
 // const firebaseConfig = {
 //   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,14 +14,15 @@ import { getFunctions } from "firebase/functions";
 // };
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCIno14q2G5CN5slM86pmmCUnIr9coBdxI",
-  authDomain: "tutuly-6acc2.firebaseapp.com",
-  projectId: "tutuly-6acc2",
-  storageBucket: "tutuly-6acc2.appspot.com",
-  messagingSenderId: "584942139746",
-  appId: "1:584942139746:web:bf0d73a9a200e86109d43b",
-  measurementId: "G-FPX6Q2DD4F",
+	apiKey: "AIzaSyCIno14q2G5CN5slM86pmmCUnIr9coBdxI",
+	authDomain: "tutuly-6acc2.firebaseapp.com",
+	projectId: "tutuly-6acc2",
+	storageBucket: "tutuly-6acc2.appspot.com",
+	messagingSenderId: "584942139746",
+	appId: "1:584942139746:web:bf0d73a9a200e86109d43b",
+	measurementId: "G-FPX6Q2DD4F",
 };
+
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 export const db = getFirestore(app);
