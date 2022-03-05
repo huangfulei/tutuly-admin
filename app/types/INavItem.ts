@@ -6,6 +6,7 @@ export interface INavItem {
   level: number;
   position: number;
   pages?: INavItem[];
+  url?: string;
   label?: ILabel;
   navItems?: INavItem[];
   features?: INavItem[];

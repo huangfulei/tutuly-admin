@@ -5,10 +5,12 @@ export interface IProductOverview {
   name: string;
   priority: number;
   status: string;
+  price: number;
   mainImage?: IImage;
-  rating?: number;
-  labels?: { [index: string]: string };
-  description: string;
+  rating: number;
+  labels: string[];
+  categories: { lvl0: string; lvl1: string; lvl2: string };
+  description: RawDraftContentState;
   details?: IDetail[];
   variants: IVariant[];
 }
@@ -18,6 +20,7 @@ export interface IVariant {
   name: string;
   price: number;
   stock: number;
+  onSalePrice?: { id: string; value: number | string };
   images?: IImage[];
 }
 

@@ -85,7 +85,7 @@ const ProductList: React.FunctionComponent<ProductListProps> = (props) => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {Object.keys(product.labels || []).map((label: string) => {
+                    {(product.labels || []).map((label: string) => {
                       return (
                         <div key={label} className="text-sm text-gray-900">
                           {label}

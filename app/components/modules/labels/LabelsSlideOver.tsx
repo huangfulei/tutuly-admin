@@ -27,7 +27,9 @@ const LabelsSlideOver: React.FunctionComponent<LabelsSlideOverProps> = (
 
   return (
     <SlideOverLayout title="Label" open={open} setOpen={setOpen}>
-      <div className="relative w-96 h-96 flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2">
+        <div className="relative w-96 h-96 ">
+
         <ImageUpload
           limit={1}
           images={label?.image ? [label.image] : undefined}
@@ -40,13 +42,24 @@ const LabelsSlideOver: React.FunctionComponent<LabelsSlideOverProps> = (
             delete newLabel.image;
             setNewLabel({ ...newLabel });
           }}
-        />
+          />
+          </div>
         <input
           type="text"
           placeholder="Name"
           defaultValue={newLabel?.name}
           onChange={(event) => {
             newLabel.name = event.target.value;
+            setNewLabel({ ...newLabel });
+          }}
+          className="w-full input input-primary input-bordered"
+        />
+        <input
+          type="number"
+          placeholder="Priority"
+          defaultValue={newLabel?.priority}
+          onChange={(event) => {
+            newLabel.priority = Number(event.target.value);
             setNewLabel({ ...newLabel });
           }}
           className="w-full input input-primary input-bordered"

@@ -15,6 +15,7 @@ import { deleteADoc } from "./../firebase/firestore/client";
 const newLabel: ILabel = {
   id: uuid(),
   name: "",
+  priority: 0,
 };
 interface LabelsProps {
   labels: ILabel[];

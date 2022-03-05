@@ -3,6 +3,7 @@ import {
   deleteObject,
   getDownloadURL,
   ref,
+  StorageReference,
   uploadBytes,
 } from "firebase/storage";
 import Image from "next/image";
@@ -35,16 +36,45 @@ const ImageUpload: React.FunctionComponent<ImageUploadProps> = (props) => {
 
   const uploadImage = async (image: File) => {
     const imageName = image.name;
-    const storageRef = ref(storage, location + imageName);
+    const resizedName =
+      imageName.slice(0, imageName.indexOf(".")) +
+      "_500x500" +
+      imageName.slice(imageName.indexOf("."));
+
+    const originRef = ref(storage, location + imageName);
+    const resizedRef = ref(storage, location + "resized/" + resizedName);
 
     //   'file' comes from the Blob or File API
-    await uploadBytes(storageRef, image);
-    const url = await getDownloadURL(storageRef);
+    await uploadBytes(originRef, image);
+
+    // try 3 times to get the new download url
+    await setTimeout(async () => {
+      try {
+        setNewImage(resizedRef, resizedName);
+      } catch (error) {
+        await setTimeout(async () => {
+          try {
+            await setNewImage(resizedRef, resizedName);
+          } catch {
+            await setTimeout(async () => {
+              await setNewImage(resizedRef, resizedName);
+            }, 2000);
+          }
+        }, 2000);
+      }
+    }, 2000);
+  };
+
+  const setNewImage = async (
+    resizedRef: StorageReference,
+    resizedName: string
+  ) => {
+    const url = await getDownloadURL(resizedRef);
     // `url` is the download URL for 'images/stars.jpg'
     const newImage: IImage = {
-      name: imageName,
+      name: resizedName,
       src: url,
-      alt: imageName,
+      alt: resizedName,
     };
     onUploadFinished(newImage);
     setUploadedImgs([...uploadedImgs, newImage]);

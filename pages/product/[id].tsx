@@ -11,6 +11,7 @@ import {
   getAllDocs,
   setDocWithID,
 } from "../../firebase/firestore/client";
+import { RawDraftContentState } from "draft-js";
 interface ProductProps {
   product: IProductOverview;
   status: string;
@@ -73,12 +74,35 @@ const Product: React.FunctionComponent<ProductProps> = (props) => {
 // };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const content = {
+    entityMap: {},
+    blocks: [
+      {
+        key: "637gr",
+        text: "",
+        type: "unstyled",
+        depth: 0,
+        inlineStyleRanges: [],
+        entityRanges: [],
+        data: {},
+      },
+    ],
+  };
+
   let product: IProductOverview = {
     id: "new",
     status: "Active",
     name: "",
     priority: 0,
-    description: "",
+    rating: 0,
+    price: 0,
+    labels: [],
+    categories: {
+      lvl0: "",
+      lvl1: "",
+      lvl2: "",
+    },
+    description: content as RawDraftContentState,
     variants: [{ id: uuid(), name: "", price: 0, stock: 0, images: [] }],
   };
 

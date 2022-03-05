@@ -19,7 +19,6 @@ interface MenuSlideOverProps {
 const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
   const { open, setOpen, navItem, onSave, onDelete } = props;
   const [allLabels, setAllLabels] = useState<ILabel[]>([]);
-  const pageNameRef = useRef<HTMLInputElement>(null);
   const [newNavItem, setNewNavItem] = useState<INavItem>({ ...navItem });
 
   const getAllLabels = async () => {
@@ -44,7 +43,6 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
     <SlideOverLayout title="Page" open={open} setOpen={setOpen}>
       <div className="flex flex-col space-y-2">
         <input
-          ref={pageNameRef}
           type="text"
           defaultValue={newNavItem.name}
           placeholder="Page Name"
@@ -52,14 +50,22 @@ const MenuSlideOver: React.FunctionComponent<MenuSlideOverProps> = (props) => {
           onChange={(event) => {
             newNavItem.name = event.target.value;
             setNewNavItem({ ...newNavItem });
-            console.log(newNavItem);
+          }}
+        />
+        <input
+          type="text"
+          defaultValue={newNavItem.url}
+          placeholder="Page url"
+          className="w-full input input-primary input-bordered"
+          onChange={(event) => {
+            newNavItem.url = event.target.value;
+            setNewNavItem({ ...newNavItem });
           }}
         />
         <button
           className="btn btn-primary"
-          disabled={newNavItem.name === ""}
+          disabled={newNavItem.name === "" || newNavItem.url === ""}
           onClick={() => {
-            // newNavItem.name = pageNameRef.current!.valu
             onSave(newNavItem);
             setOpen(false);
           }}
