@@ -1,16 +1,22 @@
 import { TrashIcon } from "@heroicons/react/outline";
 import { StorageReference, deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from "react-image-crop";
 
 import { storage } from "../../../firebase/clientApp";
+import useLoadingStateStore from "../../context/loadingStateStore";
 import { IImage } from "../../types/IImage";
+import { cropPreview } from "../../utils/cropPreview";
+import { generateDownload } from "../../utils/generateDownload";
 
 import { classNames } from "./../../utils/classNames";
+import Modal from "./Modal";
 
 interface ImageUploadProps {
 	limit: number;
 	location: string;
+	aspect: number;
 	images?: unknown[];
 	width?: number | string;
 	height?: number | string;
@@ -18,36 +24,55 @@ interface ImageUploadProps {
 	onRemoveFinished: (image: IImage, index: number) => void;
 }
 const ImageUpload: React.FunctionComponent<ImageUploadProps> = props => {
-	const { limit, images, location, width, height, onUploadFinished, onRemoveFinished } = props;
+	const { limit, images, location, aspect, width, height, onUploadFinished, onRemoveFinished } = props;
+	const [openModal, setOpenModal] = useState(false);
+	const [imageName, setImageName] = useState<string>("New Image");
+	const [imgSrc, setImgSrc] = useState("");
+	const [crop, setCrop] = useState<Crop>();
+	const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
 	const [uploadedImgs, setUploadedImgs] = useState<IImage[]>((images as IImage[]) || []);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const imgRef = useRef<unknown>(null);
+	const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+	const { setIsLoading } = useLoadingStateStore();
 
-	const uploadImage = async (image: File) => {
-		const imageName = image.name;
-		const resizedName = imageName.slice(0, imageName.indexOf(".")) + "_500x500" + imageName.slice(imageName.indexOf("."));
+	const uploadImage = async () => {
+		setIsLoading(true);
+		setOpenModal(false);
+		const fileCanvas = await generateDownload(previewCanvasRef.current!);
+		fileCanvas.toBlob(
+			async blob => {
+				if (blob) {
+					const resizedName = imageName.slice(0, imageName.indexOf(".")) + "_300x300" + imageName.slice(imageName.indexOf("."));
+					const originRef = ref(storage, location + imageName);
+					const resizedRef = ref(storage, location + "resized/" + resizedName);
 
-		const originRef = ref(storage, location + imageName);
-		const resizedRef = ref(storage, location + "resized/" + resizedName);
+					//   'file' comes from the Blob or File API
+					await uploadBytes(originRef, blob);
 
-		//   'file' comes from the Blob or File API
-		await uploadBytes(originRef, image);
-
-		// try 3 times to get the new download url
-		await setTimeout(async () => {
-			try {
-				setNewImage(resizedRef, resizedName);
-			} catch (error) {
-				await setTimeout(async () => {
-					try {
-						await setNewImage(resizedRef, resizedName);
-					} catch {
-						await setTimeout(async () => {
-							await setNewImage(resizedRef, resizedName);
-						}, 2000);
-					}
-				}, 2000);
-			}
-		}, 2000);
+					// try 3 times to get the new download url
+					await setTimeout(async () => {
+						try {
+							setNewImage(resizedRef, resizedName);
+						} catch (error) {
+							await setTimeout(async () => {
+								try {
+									await setNewImage(resizedRef, resizedName);
+								} catch {
+									await setTimeout(async () => {
+										await setNewImage(resizedRef, resizedName);
+									}, 2000);
+								}
+							}, 2000);
+						} finally {
+							setIsLoading(false);
+						}
+					}, 2000);
+				}
+			},
+			"image/png",
+			1
+		);
 	};
 
 	const setNewImage = async (resizedRef: StorageReference, resizedName: string) => {
@@ -72,6 +97,51 @@ const ImageUpload: React.FunctionComponent<ImageUploadProps> = props => {
 			onRemoveFinished(image, index);
 		});
 	};
+
+	const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files.length > 0) {
+			setImageName(e.target.files[0].name);
+			setOpenModal(true);
+			setCrop(undefined); // Makes crop preview update between images.
+			const reader = new FileReader();
+			reader.addEventListener("load", () => setImgSrc(reader.result?.toString() || ""));
+			reader.readAsDataURL(e.target.files[0]);
+		}
+	};
+
+	const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+		imgRef.current = e.currentTarget;
+		const { width, height } = e.currentTarget;
+
+		// This is to demonstate how to make and center a % aspect crop
+		// which is a bit trickier so we use some helper functions.
+		const crop = centerCrop(
+			makeAspectCrop(
+				{
+					unit: "%",
+					width: 90,
+				},
+				aspect,
+				width,
+				height
+			),
+			width,
+			height
+		);
+
+		setCrop(crop);
+	};
+
+	const updateCropPreview = useCallback(() => {
+		if (completedCrop && previewCanvasRef.current && imgRef.current) {
+			cropPreview(imgRef.current as HTMLImageElement, previewCanvasRef.current, completedCrop);
+		}
+	}, [completedCrop]);
+
+	useEffect(() => {
+		updateCropPreview();
+	}, [updateCropPreview]);
+
 	return (
 		<div className="flex space-x-2 h-full w-full">
 			{/* Add Pictures */}
@@ -83,17 +153,7 @@ const ImageUpload: React.FunctionComponent<ImageUploadProps> = props => {
 						height ? "h-" + height : "",
 						"h-full w-full mt-1 px-5 py-5 border-2 border-gray-300 border-dashed rounded-md hover: cursor-pointer"
 					)}>
-					<input
-						ref={fileInputRef}
-						type="file"
-						className="sr-only"
-						onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-							const images = event.target.files;
-							if (images && images.length > 0) {
-								uploadImage(images[0]);
-							}
-						}}
-					/>
+					<input ref={fileInputRef} type="file" className="sr-only" accept="image/*" onChange={onSelectFile} />
 					<div className="space-y-1 text-center">
 						<svg className="mx-auto text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
 							<path
@@ -114,6 +174,7 @@ const ImageUpload: React.FunctionComponent<ImageUploadProps> = props => {
 					className={classNames(
 						width ? "w-" + width : "",
 						height ? "h-" + height : "",
+						"aspect-" + aspect,
 						"relative flex justify-center hover:opacity-70 items-center h-full w-full mt-1 px-5 py-5 rounded-md hover: cursor-pointer"
 					)}>
 					<TrashIcon
@@ -123,6 +184,41 @@ const ImageUpload: React.FunctionComponent<ImageUploadProps> = props => {
 					<Image className="rounded-md" src={uploadedImg.src} alt={uploadedImg.alt} layout="fill" />
 				</div>
 			))}
+			<Modal
+				open={openModal}
+				setOpen={open => {
+					if (!open) {
+						fileInputRef.current!.value = "";
+					}
+					setOpenModal(open);
+				}}>
+				{Boolean(imgSrc) && (
+					<div className="flex flex-col items-center">
+						<ReactCrop
+							crop={crop}
+							onChange={(_, percentCrop) => setCrop(percentCrop)} // onCrop(itself) change
+							onComplete={c => setCompletedCrop(c)}
+							aspect={aspect}>
+							<img alt="Crop me" src={imgSrc} onLoad={onImageLoad} />
+						</ReactCrop>
+						<canvas
+							ref={previewCanvasRef}
+							className={"hidden"}
+							style={{
+								// Rounding is important for sharpness.
+								width: Math.floor(completedCrop?.width ?? 0),
+								height: Math.floor(completedCrop?.height ?? 0),
+							}}
+						/>
+						<button
+							className="btn btn-primary mt-2"
+							disabled={!completedCrop?.width || !completedCrop.height}
+							onClick={uploadImage}>
+							Confirm
+						</button>
+					</div>
+				)}
+			</Modal>
 		</div>
 	);
 };

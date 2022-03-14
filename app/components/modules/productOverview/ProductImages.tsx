@@ -20,6 +20,7 @@ const ProductImages: React.FunctionComponent<ProductImagesProps> = props => {
 
 	return (
 		<ImageUpload
+			aspect={1}
 			limit={5}
 			width={32}
 			height={32}

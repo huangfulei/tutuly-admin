@@ -39,13 +39,13 @@ const NavbarDesktop: React.FunctionComponent<NavbarDesktopProps> = props => {
 												: "text-gray-300 hover:bg-gray-700 hover:text-white",
 											"group flex items-center px-2 py-2 text-sm font-medium rounded-md"
 										)}>
-										<item.icon
+										{/* <item.icon
 											className={classNames(
 												item.name === currentItem ? "text-gray-300" : "text-gray-400 group-hover:text-gray-300",
 												"mr-3 flex-shrink-0 h-6 w-6"
 											)}
 											aria-hidden="true"
-										/>
+										/> */}
 										{item.name}
 									</a>
 								</Link>
@@ -63,10 +63,10 @@ const NavbarDesktop: React.FunctionComponent<NavbarDesktopProps> = props => {
 														: "text-gray-300 hover:bg-gray-700 hover:text-white",
 													"group w-full flex items-center pl-2 pr-1 py-2 text-left text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
 												)}>
-												<item.icon
+												{/* <item.icon
 													className="mr-3 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"
 													aria-hidden="true"
-												/>
+												/> */}
 												<span className="flex-1">{item.name}</span>
 												<svg
 													className={classNames(

@@ -75,13 +75,13 @@ const NavbarMobile: React.FunctionComponent<NavbarMobileProps> = props => {
 												: "text-gray-300 hover:bg-gray-700 hover:text-white",
 											"group flex items-center px-2 py-2 text-base font-medium rounded-md"
 										)}>
-										<item.icon
+										{/* <item.icon
 											className={classNames(
 												item.name === currentItem ? "text-gray-300" : "text-gray-400 group-hover:text-gray-300",
 												"mr-4 flex-shrink-0 h-6 w-6"
 											)}
 											aria-hidden="true"
-										/>
+										/> */}
 										{item.name}
 									</a>
 								))}

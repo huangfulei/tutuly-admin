@@ -19,7 +19,7 @@ export const navigation: NavItem[] = [
 		href: "#",
 	},
 	{ name: "Menu", href: "/menu", icon: FolderIcon },
-	{ name: "Calendar", href: "#", icon: CalendarIcon },
+	{ name: "Images", href: "/images", icon: CalendarIcon },
 	{ name: "Documents", href: "#", icon: InboxIcon },
 	{ name: "Reports", href: "#", icon: ChartBarIcon },
 ];

@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import { DragDropContext, Draggable, DropResult, Droppable } from "react-beautiful-dnd";
 import { BsStars } from "react-icons/bs";
 import { MdOutlineCategory } from "react-icons/md";
@@ -7,7 +8,7 @@ import { setDocWithID } from "../../../../firebase/firestore/client";
 import { INavItem } from "../../../types/INavItem";
 interface MenuProps {
 	navItems: INavItem[];
-	setNavItems: (any: unknown) => void;
+	setNavItems: Dispatch<SetStateAction<INavItem[]>>;
 	setSelectedNav: (item: INavItem) => void;
 	setLev1Pos: (pos: number) => void;
 	setLev2Pos: (pos: number) => void;

@@ -393,6 +393,7 @@ const ProductOverview: React.FC<ProductOverviewProps> = props => {
             </label> */}
 
 						<ImageUpload
+							aspect={1}
 							limit={1}
 							location={"products/"}
 							images={mainImage ? [mainImage] : undefined}

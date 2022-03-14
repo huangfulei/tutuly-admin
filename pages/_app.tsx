@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { AppLayout } from "../app/components/layouts/AppLayout";
 import useLoadingStateStore from "../app/context/loadingStateStore";
 import "../styles/globals.css";
+import "react-image-crop/dist/ReactCrop.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const { setIsLoading } = useLoadingStateStore();

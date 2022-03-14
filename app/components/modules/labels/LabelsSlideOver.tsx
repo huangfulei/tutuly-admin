@@ -14,7 +14,7 @@ interface LabelsSlideOverProps {
 }
 
 const LabelsSlideOver: React.FunctionComponent<LabelsSlideOverProps> = props => {
-	const { label, open, setOpen, onSave } = props;
+	const { label, open, setOpen, onSave, onDelete } = props;
 	const [newLabel, setNewLabel] = useState<ILabel>({ ...label });
 
 	//triggered when edit a different item or open
@@ -27,6 +27,7 @@ const LabelsSlideOver: React.FunctionComponent<LabelsSlideOverProps> = props => 
 			<div className="flex flex-col space-y-2">
 				<div className="relative w-96 h-96 ">
 					<ImageUpload
+						aspect={1}
 						limit={1}
 						images={label?.image ? [label.image] : undefined}
 						location="labels/"
@@ -68,6 +69,15 @@ const LabelsSlideOver: React.FunctionComponent<LabelsSlideOverProps> = props => 
 						setOpen(false);
 					}}>
 					Save
+				</button>
+				<button
+					className="btn btn-primary self-stretch"
+					disabled={newLabel.name === ""}
+					onClick={() => {
+						onDelete(newLabel);
+						setOpen(false);
+					}}>
+					Delete
 				</button>
 			</div>
 		</SlideOverLayout>

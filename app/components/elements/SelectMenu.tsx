@@ -2,13 +2,14 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import { Fragment, useState } from "react";
 
+import { ILabel } from "../../types/ILabel";
 import { classNames } from "../../utils/classNames";
 
 interface SelectMenuProps {
-	items: unknown[];
+	items: ILabel[];
 	defaultValue?: string;
 	title?: string;
-	onSelected: (item: unknown) => void;
+	onSelected: (item: ILabel) => void;
 }
 
 const SelectMenu: React.FunctionComponent<SelectMenuProps> = props => {
@@ -20,7 +21,7 @@ const SelectMenu: React.FunctionComponent<SelectMenuProps> = props => {
 			value={selected}
 			onChange={value => {
 				setSelected(value);
-				onSelected(value);
+				onSelected(value as ILabel);
 			}}>
 			{({ open }) => (
 				<>

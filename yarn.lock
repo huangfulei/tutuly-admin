@@ -1374,6 +1374,11 @@ cliui@^7.0.2:
     strip-ansi "^6.0.0"
     wrap-ansi "^7.0.0"
 
+clsx@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.1.1.tgz#98b3134f9abbdf23b2663491ace13c5c03a73188"
+  integrity sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==
+
 color-convert@^1.9.0:
   version "1.9.3"
   resolved "https://registry.npmjs.org/color-convert/-/color-convert-1.9.3.tgz"
@@ -3522,6 +3527,13 @@ react-icons@^4.3.1:
   version "4.3.1"
   resolved "https://registry.npmjs.org/react-icons/-/react-icons-4.3.1.tgz"
   integrity sha512-cB10MXLTs3gVuXimblAdI71jrJx8njrJZmNMEMC+sQu5B/BIOmlsAjskdqpn81y8UBVEGuHODd7/ci5DvoSzTQ==
+
+react-image-crop@^10.0.0-beta.3:
+  version "10.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/react-image-crop/-/react-image-crop-10.0.0-beta.3.tgz#77acb9c7c6f693d82d7959399f20796fbd271fb5"
+  integrity sha512-W0JP2UWdKv7IrdRNhkwiPNcd6nsjfw/wdje5lqXTsUNhUunt6FwcWnPL/jpbaJZ4/hvwQf8F6MlrYvMW+NH9wg==
+  dependencies:
+    clsx "^1.1.1"
 
 react-is@17.0.2, react-is@^17.0.2:
   version "17.0.2"
